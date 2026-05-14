@@ -241,7 +241,7 @@ export function HeroSlider({ slides = DEFAULT_SLIDES }: HeroSliderProps) {
                     crop={{ type: "fill", gravity: "auto:subject" }}
                     loading={i === 0 ? "eager" : "lazy"}
                     draggable={false}
-                    className="absolute inset-0"
+                    style={{ objectFit: "cover", objectPosition: "center" }}
                   />
                 </div>
               )}
