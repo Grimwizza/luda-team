@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { CldImage } from "next-cloudinary";
+const CLOUD = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+const cldUrl = (id: string, w: number, h: number) =>
+  `https://res.cloudinary.com/${CLOUD}/image/upload/c_fill,g_auto:subject,w_${w},h_${h}/${id}`;
 
 export interface Slide {
   type: "image" | "video";
@@ -233,16 +235,18 @@ export function HeroSlider({ slides = DEFAULT_SLIDES }: HeroSliderProps) {
                 />
               ) : (
                 <div key={kb.key} className="absolute inset-0" style={kb.style}>
-                  <CldImage
-                    src={slide.src}
-                    alt={slide.alt}
-                    fill
-                    sizes="100vw"
-                    crop={{ type: "fill", gravity: "auto:subject" }}
-                    loading={i === 0 ? "eager" : "lazy"}
-                    draggable={false}
-                    style={{ objectFit: "cover", objectPosition: "center" }}
-                  />
+                  <picture className="absolute inset-0 w-full h-full">
+                    <source media="(max-width: 768px)"  srcSet={`${cldUrl(slide.src, 768, 1200)} 1x, ${cldUrl(slide.src, 1152, 1800)} 2x`} />
+                    <source media="(min-width: 769px)"  srcSet={`${cldUrl(slide.src, 1920, 1080)} 1x, ${cldUrl(slide.src, 2560, 1440)} 2x`} />
+                    <img
+                      src={cldUrl(slide.src, 1920, 1080)}
+                      alt={slide.alt}
+                      className="absolute inset-0 w-full h-full"
+                      style={{ objectFit: "cover" }}
+                      loading={i === 0 ? "eager" : "lazy"}
+                      draggable={false}
+                    />
+                  </picture>
                 </div>
               )}
 
