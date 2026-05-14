@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import { CldImage } from "next-cloudinary";
 
 export interface Slide {
   type: "image" | "video";
@@ -11,71 +12,61 @@ export interface Slide {
   subtext?: string;
   overlayVariant: "red" | "dark" | "diagonal";
   kenBurnsDirection?: "center" | "top-left" | "bottom-right";
-  /** CSS object-position value — tune this per image to keep the subject in frame on mobile.
-   *  Format: "X% Y%"  e.g. "50% 20%" focuses upper-center, "70% 30%" focuses right-of-center-top.
-   *  Defaults to "50% 25%" if omitted. */
-  objectPosition?: string;
 }
 
 const DEFAULT_SLIDES: Slide[] = [
   {
     type: "image",
-    src: "/hero/Evan - Action Shot - 2026.jpg",
+    src: "Evan_-_Action_Shot_-_2026_zhtha4",
     alt: "Evan making an action play – 2026",
     headline: "Play with heart.",
-    subtext: "LUDA \u00b7 The Crayons",
+    subtext: "LUDA · The Crayons",
     overlayVariant: "red",
     kenBurnsDirection: "center",
-    objectPosition: "50% 20%",
   },
   {
     type: "image",
-    src: "/hero/Owen - Action Shot - 2026.jpg",
+    src: "Owen_-_Action_Shot_-_2026_z3t1sq",
     alt: "Owen in action – 2026",
     headline: "Rise up, Crayons.",
     subtext: "Spring Season 2026",
     overlayVariant: "diagonal",
     kenBurnsDirection: "bottom-right",
-    objectPosition: "50% 20%",
   },
   {
     type: "image",
-    src: "/hero/Matt & Eden - Hopkins Hustle - 2026.jpg",
+    src: "Matt_Eden_-_Hopkins_Hustle_-_2026_tyuw4z",
     alt: "Matt and Eden at Hopkins Hustle – 2026",
     headline: "Feel the energy.",
     subtext: "Hopkins Hustle 2026",
     overlayVariant: "dark",
     kenBurnsDirection: "top-left",
-    objectPosition: "50% 25%",
   },
   {
     type: "image",
-    src: "/hero/Nick - Action Shot - 2026.jpg",
+    src: "Nick_-_Action_Shot_-_2026_vtactt",
     alt: "Nick in action – 2026",
     headline: "Run. Catch. Win.",
     overlayVariant: "red",
     kenBurnsDirection: "center",
-    objectPosition: "50% 20%",
   },
   {
     type: "image",
-    src: "/hero/Logan - Action Shot - 2026.jpg",
+    src: "Logan_-_Action_Shot_-_2026_l90cum",
     alt: "Logan making a play – 2026",
     headline: "Lakeville Ultimate.",
     subtext: "Lakeville, MN",
     overlayVariant: "diagonal",
     kenBurnsDirection: "bottom-right",
-    objectPosition: "50% 20%",
   },
   {
     type: "image",
-    src: "/hero/Matt - Action Shot - 2026.jpg",
+    src: "Matt_-_Action_Shot_-_2026_kwzxu8",
     alt: "Matt in action – 2026",
     headline: "This is LUDA.",
     subtext: "Twin Cities Invitational",
     overlayVariant: "dark",
     kenBurnsDirection: "top-left",
-    objectPosition: "50% 20%",
   },
 ];
 
@@ -242,13 +233,15 @@ export function HeroSlider({ slides = DEFAULT_SLIDES }: HeroSliderProps) {
                 />
               ) : (
                 <div key={kb.key} className="absolute inset-0" style={kb.style}>
-                  <img
+                  <CldImage
                     src={slide.src}
                     alt={slide.alt}
-                    className="absolute inset-0 w-full h-full"
-                    style={{ objectFit: "cover", objectPosition: slide.objectPosition ?? "50% 25%" }}
+                    fill
+                    sizes="100vw"
+                    crop={{ type: "fill", gravity: "auto:subject" }}
                     loading={i === 0 ? "eager" : "lazy"}
                     draggable={false}
+                    className="absolute inset-0"
                   />
                 </div>
               )}
