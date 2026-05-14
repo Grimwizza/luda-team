@@ -11,8 +11,8 @@ export const size = {
 export const contentType = "image/png";
 
 export default async function Image() {
-  const iconData = readFileSync(join(process.cwd(), "public/icon-512.png"));
-  const base64Icon = `data:image/png;base64,${iconData.toString("base64")}`;
+  const buffer = readFileSync(join(process.cwd(), "public/icon-512.png"));
+  const arrayBuffer = buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);
 
   return new ImageResponse(
     (
@@ -29,7 +29,7 @@ export default async function Image() {
         }}
       >
         <img
-          src={base64Icon}
+          src={arrayBuffer as any}
           width="320"
           height="320"
           alt="LUDA Logo"
