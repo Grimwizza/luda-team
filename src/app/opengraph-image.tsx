@@ -18,7 +18,7 @@ export default async function Image() {
   const bgBuffer = await fetch(bgUrl).then((res) => res.arrayBuffer());
 
   // Read logo
-  const logoBuffer = readFileSync(join(process.cwd(), "public/icon-512.png"));
+  const logoBuffer = readFileSync(join(process.cwd(), "public/LUDA-logo.png"));
   const logoArrayBuffer = logoBuffer.buffer.slice(logoBuffer.byteOffset, logoBuffer.byteOffset + logoBuffer.byteLength);
 
   return new ImageResponse(
@@ -42,22 +42,14 @@ export default async function Image() {
           alt="Background"
         />
         {/* Dark overlay for contrast */}
-        <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", backgroundColor: "rgba(0,0,0,0.65)", display: "flex" }} />
+        <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", backgroundColor: "rgba(0,0,0,0.5)", display: "flex" }} />
 
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", zIndex: 10 }}>
           <img
             src={logoArrayBuffer as any}
-            width="240"
-            height="240"
+            width="400"
             alt="LUDA Logo"
-            style={{ marginBottom: 30 }}
           />
-          <div style={{ fontSize: 64, fontWeight: 900, color: "#ffffff", display: "flex", letterSpacing: "-1px" }}>
-            LAKEVILLE ULTIMATE
-          </div>
-          <div style={{ fontSize: 32, fontWeight: 700, color: "#CC0000", marginTop: 15, display: "flex" }}>
-            THE CRAYONS • HIGH SCHOOL ULTIMATE
-          </div>
         </div>
       </div>
     ),
