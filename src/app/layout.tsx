@@ -14,6 +14,7 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://luda.team"),
   title:       "The Crayons | LUDA Ultimate Frisbee",
   description: "Lakeville Ultimate Disc Association — high school ultimate frisbee team.",
   keywords:    ["ultimate frisbee", "LUDA", "Lakeville", "high school", "The Crayons"],
