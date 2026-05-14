@@ -35,10 +35,9 @@ const DEFAULT_SLIDES: Slide[] = [
   },
   {
     type: "image",
-    src: "/gallery/Matt & Eden - Hopkins Hustle - 2026.jpg",
-    alt: "Matt and Eden at Hopkins Hustle – 2026",
+    src: "/hero/Drew - Action Shot - 2026.jpg",
+    alt: "Drew in action – 2026",
     headline: "Feel the energy.",
-    subtext: "Hopkins Hustle 2026",
     overlayVariant: "dark",
     kenBurnsDirection: "top-left",
   },

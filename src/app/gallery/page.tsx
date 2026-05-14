@@ -7,39 +7,45 @@ export const metadata: Metadata = {
 const PHOTOS = [
   {
     id: 1,
-    src: "/hero/Evan - Action Shot - 2026.jpg",
+    src: "/gallery/Evan - Action Shot v2 - 2026.jpg",
     alt: "Evan making an action play",
     caption: "Play with heart.",
   },
   {
     id: 2,
-    src: "/hero/Owen - Action Shot - 2026.jpg",
+    src: "/gallery/Owen - Action Shot v2 - 2026.jpg",
     alt: "Owen in action",
     caption: "Rise up, Crayons.",
   },
   {
     id: 3,
-    src: "/hero/Matt & Eden - Hopkins Hustle - 2026.jpg",
+    src: "/gallery/Matt & Eden - Hopkins Hustle - 2026.jpg",
     alt: "Matt and Eden at Hopkins Hustle",
     caption: "Hopkins Hustle 2026",
   },
   {
     id: 4,
-    src: "/hero/Nick - Action Shot - 2026.jpg",
+    src: "/gallery/Nick - Action Shot - 2026.jpg",
     alt: "Nick in action",
     caption: "Run. Catch. Win.",
   },
   {
     id: 5,
-    src: "/hero/Logan - Action Shot - 2026.jpg",
+    src: "/gallery/Logan - Action Shot - 2026.jpg",
     alt: "Logan making a play",
     caption: "Lakeville Ultimate.",
   },
   {
     id: 6,
-    src: "/hero/Matt - Action Shot - 2026.jpg",
+    src: "/gallery/Matt - Action Shot - 2026.jpg",
     alt: "Matt in action",
     caption: "This is LUDA.",
+  },
+  {
+    id: 7,
+    src: "/gallery/Drew - Action Shot - 2026.jpg",
+    alt: "Drew in action",
+    caption: "All heart.",
   },
 ];
 
