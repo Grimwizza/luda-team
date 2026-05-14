@@ -4,6 +4,8 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { NavBar } from "@/components/NavBar";
 import { Footer } from "@/components/Footer";
+import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
+import { InstallPrompt } from "@/components/InstallPrompt";
 import React from "react";
 
 const nunito = Nunito({
@@ -38,7 +40,9 @@ export default function RootLayout({
           <NavBar />
           <main className="flex-1 pt-16">{children}</main>
           <Footer />
+          <InstallPrompt />
         </ThemeProvider>
+        <ServiceWorkerRegister />
       </body>
     </html>
   );
