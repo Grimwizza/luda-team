@@ -1,0 +1,89 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap");
+@import "tailwindcss";
+
+/* ─── LUDA Design Tokens ─────────────────────────────────────────── */
+@theme {
+  --color-luda-red:   #D00000;
+  --color-luda-white: #FFFFFF;
+  --color-luda-black: #1A1A1A;
+
+  --font-nunito: 'Nunito', sans-serif;
+
+  --radius-2xl: 1rem;
+  --radius-3xl: 1.5rem;
+  --radius-4xl: 2rem;
+}
+
+/* ─── Theme: White (default — white jersey) ──────────────────────── */
+:root,
+[data-theme="white"] {
+  --bg:          #FFFFFF;
+  --bg-muted:    #F5F5F5;
+  --fg:          #1A1A1A;
+  --fg-muted:    #555555;
+  --accent:      #D00000;
+  --accent-fg:   #FFFFFF;
+  --border:      #E5E5E5;
+  --nav-bg:      #FFFFFF;
+  --nav-fg:      #1A1A1A;
+  --nav-border:  #E5E5E5;
+  --card-bg:     #F5F5F5;
+  --card-border: #E5E5E5;
+  --link:        #D00000;
+}
+
+/* ─── Theme: Red (red jersey) ────────────────────────────────────── */
+[data-theme="red"] {
+  --bg:          #D00000;
+  --bg-muted:    rgba(0, 0, 0, 0.15);
+  --fg:          #FFFFFF;
+  --fg-muted:    rgba(255, 255, 255, 0.75);
+  --accent:      #FFFFFF;
+  --accent-fg:   #D00000;
+  --border:      rgba(255, 255, 255, 0.25);
+  --nav-bg:      #D00000;
+  --nav-fg:      #FFFFFF;
+  --nav-border:  transparent;
+  --card-bg:     rgba(0, 0, 0, 0.2);
+  --card-border: rgba(255, 255, 255, 0.2);
+  --link:        #FFD0D0;
+}
+
+/* ─── Base ───────────────────────────────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body {
+  background-color: var(--bg);
+  color:            var(--fg);
+  font-family:      var(--font-nunito), 'Nunito', sans-serif;
+  transition:       background-color 0.3s ease, color 0.3s ease;
+  min-height:       100vh;
+  display:          flex;
+  flex-direction:   column;
+}
+
+/* ─── Red theme — subtle disc/dot texture ────────────────────────── */
+[data-theme="red"] body {
+  background-image: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.07) 1.5px,
+    transparent 1.5px
+  );
+  background-size: 22px 22px;
+}
+
+/* ─── Jersey Swap animation ──────────────────────────────────────── */
+@keyframes jersey-flip {
+  0%   { transform: rotate(0deg)   scale(1);    }
+  20%  { transform: rotate(-20deg) scale(1.18); }
+  50%  { transform: rotate(20deg)  scale(1.22); }
+  75%  { transform: rotate(-8deg)  scale(1.08); }
+  100% { transform: rotate(0deg)   scale(1);    }
+}
+
+.jersey-flip {
+  animation: jersey-flip 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
