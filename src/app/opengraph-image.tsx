@@ -11,8 +11,15 @@ export const size = {
 export const contentType = "image/png";
 
 export default async function Image() {
-  const buffer = readFileSync(join(process.cwd(), "public/icon-512.png"));
-  const arrayBuffer = buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);
+  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+  const bgUrl = `https://res.cloudinary.com/${cloudName}/image/upload/c_fill,g_auto:subject,w_1200,h_630/Nick_-_Action_Shot_-_2026_vtactt`;
+  
+  // Fetch background image
+  const bgBuffer = await fetch(bgUrl).then((res) => res.arrayBuffer());
+
+  // Read logo
+  const logoBuffer = readFileSync(join(process.cwd(), "public/icon-512.png"));
+  const logoArrayBuffer = logoBuffer.buffer.slice(logoBuffer.byteOffset, logoBuffer.byteOffset + logoBuffer.byteLength);
 
   return new ImageResponse(
     (
@@ -21,25 +28,36 @@ export default async function Image() {
           width: "100%",
           height: "100%",
           display: "flex",
-          flexDirection: "column",
+          position: "relative",
           alignItems: "center",
           justifyContent: "center",
-          backgroundColor: "#111111", // Dark background matching site theme
-          color: "#ffffff",
+          flexDirection: "column",
         }}
       >
         <img
-          src={arrayBuffer as any}
-          width="320"
-          height="320"
-          alt="LUDA Logo"
-          style={{ marginBottom: 50 }}
+          src={bgBuffer as any}
+          width="1200"
+          height="630"
+          style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover" }}
+          alt="Background"
         />
-        <div style={{ fontSize: 56, fontWeight: 900, display: "flex", letterSpacing: "-1px" }}>
-          LAKEVILLE ULTIMATE DISC ASSOCIATION
-        </div>
-        <div style={{ fontSize: 32, fontWeight: 700, color: "#CC0000", marginTop: 20, display: "flex" }}>
-          THE CRAYONS • HIGH SCHOOL ULTIMATE
+        {/* Dark overlay for contrast */}
+        <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", backgroundColor: "rgba(0,0,0,0.65)", display: "flex" }} />
+
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", zIndex: 10 }}>
+          <img
+            src={logoArrayBuffer as any}
+            width="240"
+            height="240"
+            alt="LUDA Logo"
+            style={{ marginBottom: 30 }}
+          />
+          <div style={{ fontSize: 64, fontWeight: 900, color: "#ffffff", display: "flex", letterSpacing: "-1px" }}>
+            LAKEVILLE ULTIMATE
+          </div>
+          <div style={{ fontSize: 32, fontWeight: 700, color: "#CC0000", marginTop: 15, display: "flex" }}>
+            THE CRAYONS • HIGH SCHOOL ULTIMATE
+          </div>
         </div>
       </div>
     ),
