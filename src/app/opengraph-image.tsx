@@ -11,13 +11,9 @@ export const size = {
 export const contentType = "image/png";
 
 export default async function Image() {
-  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-  const bgUrl = `https://res.cloudinary.com/${cloudName}/image/upload/c_fill,g_auto:subject,w_1200,h_630/Nick_-_Action_Shot_-_2026_vtactt`;
-  
-  // Fetch background image
-  const bgBuffer = await fetch(bgUrl).then((res) => res.arrayBuffer());
+  const bgBuffer = readFileSync(join(process.cwd(), "public/hero/Nick - Action Shot - 2026.jpg"));
+  const bgArrayBuffer = bgBuffer.buffer.slice(bgBuffer.byteOffset, bgBuffer.byteOffset + bgBuffer.byteLength);
 
-  // Read logo
   const logoBuffer = readFileSync(join(process.cwd(), "public/LUDA-logo.png"));
   const logoArrayBuffer = logoBuffer.buffer.slice(logoBuffer.byteOffset, logoBuffer.byteOffset + logoBuffer.byteLength);
 
@@ -35,7 +31,7 @@ export default async function Image() {
         }}
       >
         <img
-          src={bgBuffer as any}
+          src={bgArrayBuffer as any}
           width="1200"
           height="630"
           style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover" }}

@@ -1,9 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-const CLOUD = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-const cldUrl = (id: string, w: number, h: number) =>
-  `https://res.cloudinary.com/${CLOUD}/image/upload/c_fill,g_auto:subject,w_${w},h_${h}/${id}`;
+import Image from "next/image";
 
 export interface Slide {
   type: "image" | "video";
@@ -19,7 +17,7 @@ export interface Slide {
 const DEFAULT_SLIDES: Slide[] = [
   {
     type: "image",
-    src: "Evan_-_Action_Shot_-_2026_zhtha4",
+    src: "/hero/Evan - Action Shot v2 - 2026.jpg",
     alt: "Evan making an action play – 2026",
     headline: "Play with heart.",
     subtext: "LUDA · The Crayons",
@@ -28,7 +26,7 @@ const DEFAULT_SLIDES: Slide[] = [
   },
   {
     type: "image",
-    src: "Owen_-_Action_Shot_-_2026_z3t1sq",
+    src: "/hero/Owen - Action Shot v2 - 2026.jpg",
     alt: "Owen in action – 2026",
     headline: "Rise up, Crayons.",
     subtext: "Spring Season 2026",
@@ -37,7 +35,7 @@ const DEFAULT_SLIDES: Slide[] = [
   },
   {
     type: "image",
-    src: "Matt_Eden_-_Hopkins_Hustle_-_2026_tyuw4z",
+    src: "/gallery/Matt & Eden - Hopkins Hustle - 2026.jpg",
     alt: "Matt and Eden at Hopkins Hustle – 2026",
     headline: "Feel the energy.",
     subtext: "Hopkins Hustle 2026",
@@ -46,7 +44,7 @@ const DEFAULT_SLIDES: Slide[] = [
   },
   {
     type: "image",
-    src: "Nick_-_Action_Shot_-_2026_vtactt",
+    src: "/hero/Nick - Action Shot - 2026.jpg",
     alt: "Nick in action – 2026",
     headline: "Run. Catch. Win.",
     overlayVariant: "red",
@@ -54,7 +52,7 @@ const DEFAULT_SLIDES: Slide[] = [
   },
   {
     type: "image",
-    src: "Logan_-_Action_Shot_-_2026_l90cum",
+    src: "/hero/Logan - Action Shot - 2026.jpg",
     alt: "Logan making a play – 2026",
     headline: "Lakeville Ultimate.",
     subtext: "Lakeville, MN",
@@ -63,7 +61,7 @@ const DEFAULT_SLIDES: Slide[] = [
   },
   {
     type: "image",
-    src: "Matt_-_Action_Shot_-_2026_kwzxu8",
+    src: "/hero/Matt - Action Shot - 2026.jpg",
     alt: "Matt in action – 2026",
     headline: "This is LUDA.",
     subtext: "Twin Cities Invitational",
@@ -235,18 +233,16 @@ export function HeroSlider({ slides = DEFAULT_SLIDES }: HeroSliderProps) {
                 />
               ) : (
                 <div key={kb.key} className="absolute inset-0" style={kb.style}>
-                  <picture className="absolute inset-0 w-full h-full">
-                    <source media="(max-width: 768px)"  srcSet={`${cldUrl(slide.src, 768, 1200)} 1x, ${cldUrl(slide.src, 1152, 1800)} 2x`} />
-                    <source media="(min-width: 769px)"  srcSet={`${cldUrl(slide.src, 1920, 1080)} 1x, ${cldUrl(slide.src, 2560, 1440)} 2x`} />
-                    <img
-                      src={cldUrl(slide.src, 1920, 1080)}
-                      alt={slide.alt}
-                      className="absolute inset-0 w-full h-full"
-                      style={{ objectFit: "cover" }}
-                      loading={i === 0 ? "eager" : "lazy"}
-                      draggable={false}
-                    />
-                  </picture>
+                  <Image
+                    src={slide.src}
+                    alt={slide.alt}
+                    fill
+                    sizes="100vw"
+                    style={{ objectFit: "cover" }}
+                    loading={i === 0 ? "eager" : "lazy"}
+                    priority={i === 0}
+                    draggable={false}
+                  />
                 </div>
               )}
 
