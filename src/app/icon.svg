@@ -1,9 +1,15 @@
 <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-  <defs><clipPath id="dc"><circle cx="100" cy="100" r="72"/></clipPath></defs>
+  <defs><clipPath id="dc"><circle cx="100" cy="100" r="72"/></clipPath><path id="topArc" d="M 21.15 63.23 A 87 87 0 0 1 178.85 63.23" fill="none"/><path id="botArc" d="M 178.85 136.77 A 87 87 0 0 1 21.15 136.77" fill="none"/></defs>
+  <circle cx="100" cy="100" r="95" fill="#1a1a1a"/>
   <circle cx="100" cy="100" r="72" fill="#CC0000"/>
   <path d="M 140.15 42.66 A 70.00 70.00 0 1 1 59.85 42.66 L 64.44 49.21 A 62.00 62.00 0 1 0 135.56 49.21 Z" fill="#1a1a1a"/>
   <path d="M 131.55 54.95 A 55.00 55.00 0 1 1 68.45 54.95 L 73.04 61.50 A 47.00 47.00 0 1 0 126.96 61.50 Z" fill="#1a1a1a"/>
   <path d="M 122.94 67.23 A 40.00 40.00 0 1 1 77.06 67.23 L 81.65 73.79 A 32.00 32.00 0 1 0 118.35 73.79 Z" fill="#1a1a1a"/>
   <path d="M 114.34 79.52 A 25.00 25.00 0 1 1 85.66 79.52 L 90.25 86.07 A 17.00 17.00 0 1 0 109.75 86.07 Z" fill="#1a1a1a"/>
   <rect x="31.0" y="64.0" width="12" height="92.2" rx="6.0" fill="#1a1a1a" clip-path="url(#dc)"/>
+  <text x="100" y="110.4" text-anchor="middle" dominant-baseline="middle" font-family="Arial Black,Arial,Helvetica,sans-serif" font-weight="900" font-size="28" letter-spacing="-0.5" fill="#ffffff">LUDA</text>
+  <text font-family="Arial Black,Arial,Helvetica,sans-serif" font-weight="900" font-size="11.5" fill="#ffffff" letter-spacing="3"><textPath href="#topArc" startOffset="50%" text-anchor="middle">LAKEVILLE ULTIMATE</textPath></text>
+  <text font-family="Arial Black,Arial,Helvetica,sans-serif" font-weight="900" font-size="11.5" fill="#ffffff" letter-spacing="3"><textPath href="#botArc" startOffset="50%" text-anchor="middle">DISC ASSOCIATION</textPath></text>
+  <circle cx="187.0" cy="100.0" r="3.5" fill="#CC0000"/>
+  <circle cx="13.0" cy="100.0" r="3.5" fill="#CC0000"/>
 </svg>

@@ -17,6 +17,12 @@ export const metadata: Metadata = {
   title:       "The Crayons | LUDA Ultimate Frisbee",
   description: "Lakeville Ultimate Disc Association — high school ultimate frisbee team.",
   keywords:    ["ultimate frisbee", "LUDA", "Lakeville", "high school", "The Crayons"],
+  appleWebApp: {
+    capable:        true,
+    title:          "LUDA",
+    statusBarStyle: "black-translucent",
+  },
+  formatDetection: { telephone: false },
 };
 
 export default function RootLayout({
