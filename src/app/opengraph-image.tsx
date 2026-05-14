@@ -41,13 +41,13 @@ export default async function Image() {
           style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover" }}
           alt="Background"
         />
-        {/* Dark overlay for contrast */}
-        <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", backgroundColor: "rgba(0,0,0,0.5)", display: "flex" }} />
+        {/* Removed dark overlay as requested */}
 
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", zIndex: 10 }}>
           <img
             src={logoArrayBuffer as any}
             width="400"
+            height="400"
             alt="LUDA Logo"
           />
         </div>
