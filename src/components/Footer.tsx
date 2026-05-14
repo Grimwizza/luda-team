@@ -1,4 +1,3 @@
-import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -22,7 +21,7 @@ export function Footer() {
               className="mb-3"
             />
             <p className="font-black text-sm" style={{ color: "var(--fg)" }}>The Crayons</p>
-            <p className="text-sm mt-0.5">High School Ultimate Frisbee</p>
+            <p className="text-sm mt-0.5">Lakeville Ultimate Disc Association</p>
           </div>
 
           {/* Quick Links */}
@@ -35,8 +34,10 @@ export function Footer() {
                 ["/team",     "Team Roster"],
                 ["/schedule", "Schedule"],
                 ["/gallery",  "Gallery"],
+                ["/board",    "Board"],
                 ["/register", "Register"],
                 ["/contact",  "Contact"],
+
               ] as [string, string][]).map(([href, label]) => (
                 <Link
                   key={href}
@@ -63,16 +64,26 @@ export function Footer() {
                 className="flex items-center gap-2 hover:opacity-80 transition-opacity"
                 style={{ color: "var(--fg)" }}
               >
-                <InstagramIcon className="w-4 h-4" style={{ color: "var(--accent)" }} />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/instagram-icon.png" alt="Instagram" className="w-4 h-4 rounded-sm" />
                 @lakevillenorthultimate
               </a>
               <a
-                href="#"
+                href="https://www.band.us/band/101047291/"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="flex items-center gap-2 hover:opacity-80 transition-opacity"
                 style={{ color: "var(--fg)" }}
               >
-                <BandIcon className="w-4 h-4" style={{ color: "var(--accent)" }} />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/band-icon.png" alt="Band App" className="w-4 h-4 rounded-sm" />
                 Band App — Team Chat
+                <span
+                  className="text-xs font-bold px-1.5 py-0.5 rounded-full"
+                  style={{ backgroundColor: "var(--accent)", color: "var(--accent-fg)" }}
+                >
+                  Invite Only
+                </span>
               </a>
             </div>
           </div>
@@ -89,20 +100,5 @@ export function Footer() {
   );
 }
 
-function InstagramIcon({ className, style }: { className?: string; style?: React.CSSProperties }) {
-  return (
-    <svg className={className} style={style} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-      <circle cx="12" cy="12" r="4" />
-      <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none" />
-    </svg>
-  );
-}
 
-function BandIcon({ className, style }: { className?: string; style?: React.CSSProperties }) {
-  return (
-    <svg className={className} style={style} viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/>
-    </svg>
-  );
-}
+

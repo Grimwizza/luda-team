@@ -4,15 +4,46 @@ export const metadata: Metadata = {
   title: "Gallery | The Crayons LUDA",
 };
 
-// Placeholder images — replace with Cloudinary URLs
-const PLACEHOLDER_PHOTOS = Array.from({ length: 9 }, (_, i) => ({
-  id:      i + 1,
-  src:     `https://placehold.co/600x400/D00000/FFFFFF?text=Photo+${i + 1}`,
-  alt:     `Team photo ${i + 1}`,
-  caption: ["Game day!", "Tournament action", "Practice vibes", "The team!", "Disc goes up!", "Great catch", "Team huddle", "Celebrating a point", "Post-game"][i],
-}));
+const PHOTOS = [
+  {
+    id: 1,
+    src: "/hero/Evan - Action Shot - 2026.jpg",
+    alt: "Evan making an action play",
+    caption: "Play with heart.",
+  },
+  {
+    id: 2,
+    src: "/hero/Owen - Action Shot - 2026.jpg",
+    alt: "Owen in action",
+    caption: "Rise up, Crayons.",
+  },
+  {
+    id: 3,
+    src: "/hero/Matt & Eden - Hopkins Hustle - 2026.jpg",
+    alt: "Matt and Eden at Hopkins Hustle",
+    caption: "Hopkins Hustle 2026",
+  },
+  {
+    id: 4,
+    src: "/hero/Nick - Action Shot - 2026.jpg",
+    alt: "Nick in action",
+    caption: "Run. Catch. Win.",
+  },
+  {
+    id: 5,
+    src: "/hero/Logan - Action Shot - 2026.jpg",
+    alt: "Logan making a play",
+    caption: "Lakeville Ultimate.",
+  },
+  {
+    id: 6,
+    src: "/hero/Matt - Action Shot - 2026.jpg",
+    alt: "Matt in action",
+    caption: "This is LUDA.",
+  },
+];
 
-const GOOGLE_PHOTOS_URL = "https://photos.google.com"; // TODO: Replace with real shared album URL
+const GOOGLE_PHOTOS_URL = "https://photos.app.goo.gl/BQm2qTJqvwRpShR99";
 
 export default function GalleryPage() {
   return (
@@ -35,7 +66,7 @@ export default function GalleryPage() {
 
       {/* Photo grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-        {PLACEHOLDER_PHOTOS.map((photo) => (
+        {PHOTOS.map((photo) => (
           <div
             key={photo.id}
             style={{ borderColor: "var(--card-border)" }}
@@ -56,16 +87,6 @@ export default function GalleryPage() {
         ))}
       </div>
 
-      {/* Cloudinary note */}
-      <div
-        style={{ backgroundColor: "var(--bg-muted)", borderColor: "var(--card-border)" }}
-        className="mt-12 border rounded-3xl p-6 text-center"
-      >
-        <p className="font-bold" style={{ color: "var(--fg)" }}>📦 Cloudinary Integration Ready</p>
-        <p className="text-sm mt-1" style={{ color: "var(--fg-muted)" }}>
-          Replace placeholder images with Cloudinary URLs — or wire up the Cloudinary SDK for dynamic image optimization.
-        </p>
-      </div>
     </div>
   );
 }

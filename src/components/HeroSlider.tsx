@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import Image from "next/image";
 
 export interface Slide {
   type: "image" | "video";
@@ -12,68 +11,71 @@ export interface Slide {
   subtext?: string;
   overlayVariant: "red" | "dark" | "diagonal";
   kenBurnsDirection?: "center" | "top-left" | "bottom-right";
+  /** CSS object-position value — tune this per image to keep the subject in frame on mobile.
+   *  Format: "X% Y%"  e.g. "50% 20%" focuses upper-center, "70% 30%" focuses right-of-center-top.
+   *  Defaults to "50% 25%" if omitted. */
+  objectPosition?: string;
 }
 
 const DEFAULT_SLIDES: Slide[] = [
   {
     type: "image",
-    src: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1920&q=80",
-    alt: "Athletes competing in ultimate frisbee",
+    src: "/hero/Evan - Action Shot - 2026.jpg",
+    alt: "Evan making an action play – 2026",
     headline: "Play with heart.",
     subtext: "LUDA \u00b7 The Crayons",
     overlayVariant: "red",
     kenBurnsDirection: "center",
-  },
-  {
-    type: "video",
-    src: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
-    posterSrc: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1920&q=80",
-    alt: "Energetic sports highlight reel",
-    headline: "Feel the energy.",
-    overlayVariant: "red",
+    objectPosition: "50% 20%",
   },
   {
     type: "image",
-    src: "https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=1920&q=80",
-    alt: "Sports action shot",
-    headline: "Lakeville Ultimate.",
-    subtext: "Spring Season 2026",
-    overlayVariant: "dark",
-    kenBurnsDirection: "top-left",
-  },
-  {
-    type: "image",
-    src: "https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?w=1920&q=80",
-    alt: "Frisbee player in action",
+    src: "/hero/Owen - Action Shot - 2026.jpg",
+    alt: "Owen in action – 2026",
     headline: "Rise up, Crayons.",
+    subtext: "Spring Season 2026",
     overlayVariant: "diagonal",
     kenBurnsDirection: "bottom-right",
-  },
-  {
-    type: "video",
-    src: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4",
-    posterSrc: "https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=1920&q=80",
-    alt: "Game day action footage",
-    headline: "Game day.",
-    overlayVariant: "dark",
+    objectPosition: "50% 20%",
   },
   {
     type: "image",
-    src: "https://images.unsplash.com/photo-1547347298-4074fc3086f0?w=1920&q=80",
-    alt: "Team sports competition",
-    headline: "This is LUDA.",
-    subtext: "Lakeville, MN",
+    src: "/hero/Matt & Eden - Hopkins Hustle - 2026.jpg",
+    alt: "Matt and Eden at Hopkins Hustle – 2026",
+    headline: "Feel the energy.",
+    subtext: "Hopkins Hustle 2026",
+    overlayVariant: "dark",
+    kenBurnsDirection: "top-left",
+    objectPosition: "50% 25%",
+  },
+  {
+    type: "image",
+    src: "/hero/Nick - Action Shot - 2026.jpg",
+    alt: "Nick in action – 2026",
+    headline: "Run. Catch. Win.",
     overlayVariant: "red",
     kenBurnsDirection: "center",
+    objectPosition: "50% 20%",
   },
   {
     type: "image",
-    src: "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=1920&q=80",
-    alt: "Athletes in motion",
-    headline: "Run. Catch. Win.",
+    src: "/hero/Logan - Action Shot - 2026.jpg",
+    alt: "Logan making a play – 2026",
+    headline: "Lakeville Ultimate.",
+    subtext: "Lakeville, MN",
+    overlayVariant: "diagonal",
+    kenBurnsDirection: "bottom-right",
+    objectPosition: "50% 20%",
+  },
+  {
+    type: "image",
+    src: "/hero/Matt - Action Shot - 2026.jpg",
+    alt: "Matt in action – 2026",
+    headline: "This is LUDA.",
     subtext: "Twin Cities Invitational",
     overlayVariant: "dark",
     kenBurnsDirection: "top-left",
+    objectPosition: "50% 20%",
   },
 ];
 
@@ -244,7 +246,7 @@ export function HeroSlider({ slides = DEFAULT_SLIDES }: HeroSliderProps) {
                     src={slide.src}
                     alt={slide.alt}
                     className="absolute inset-0 w-full h-full"
-                    style={{ objectFit: "cover", objectPosition: "center" }}
+                    style={{ objectFit: "cover", objectPosition: slide.objectPosition ?? "50% 25%" }}
                     loading={i === 0 ? "eager" : "lazy"}
                     draggable={false}
                   />
@@ -265,19 +267,6 @@ export function HeroSlider({ slides = DEFAULT_SLIDES }: HeroSliderProps) {
             </div>
           );
         })}
-
-        {/* LUDA logo — centered top overlay */}
-        <div className="absolute top-24 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
-          <Image
-            src="/LUDA.gif"
-            alt="LUDA"
-            width={110}
-            height={110}
-            unoptimized
-            draggable={false}
-            style={{ opacity: 0.92 }}
-          />
-        </div>
 
         <div className="absolute bottom-0 left-0 right-0 z-10 pb-24 px-8 sm:px-14 lg:px-20 pointer-events-none">
           <div key={textKey} style={{ animation: "heroTextIn 0.55s ease 0.15s both" }}>

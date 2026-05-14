@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import React from "react";
 
 export const metadata: Metadata = {
   title: "Register | The Crayons LUDA",
@@ -8,31 +9,44 @@ export const metadata: Metadata = {
 const STEPS = [
   {
     step:  "1",
-    title: "Fill Out the Registration Form",
-    body:  "Complete the online registration form linked below. You'll need your player's name, grade, school, and emergency contact info.",
+    title: "Register with Lakeville North High School",
+    body: (
+      <>
+        Go to the <a href="https://www.lnhspanthers.com/signup" target="_blank" rel="noreferrer" className="underline hover:opacity-80" style={{ color: "var(--accent)" }}>LNHS Athletics & Activities page</a>, click on the "Activity Registration" tab, and follow the instructions. You will need to log into Arbiter (or create an account). Ensure you choose "LNHS Activities & Club Registration" (not Athletic Registration). Pay the LNHS fee.
+      </>
+    ),
   },
   {
     step:  "2",
-    title: "Pay Registration Fee",
-    body:  "Payment can be made via Venmo or check. See cost breakdown below.",
+    title: "Join Minnesota Ultimate",
+    body: (
+      <>
+        Minnesota Ultimate is our governing body. Go to the <a href="https://minnesotaultimate.org/" target="_blank" rel="noreferrer" className="underline hover:opacity-80" style={{ color: "var(--accent)" }}>MNU website</a> and sign in. Look for the "2026 High School Spring League" under Upcoming Events and select "Register Now". Pay the membership fee. Do not forget to sign the online medical waiver during this process!
+      </>
+    ),
   },
   {
     step:  "3",
-    title: "Sign the Waiver",
-    body:  "A parent or guardian must sign the participation waiver. Link will be sent after registration.",
-  },
-  {
-    step:  "4",
-    title: "Join the Band App",
-    body:  "All team communication happens on the Band app. You'll receive an invite link after registering.",
+    title: "Join Lakeville Ultimate Disc Association (LUDA)",
+    body: (
+      <div className="flex flex-col gap-2 mt-2">
+        <p>Complete the final registration steps directly with LUDA:</p>
+        <ul className="list-disc ml-5 flex flex-col gap-1">
+          <li>Read the <a href="https://drive.google.com/file/d/1aG2Y3e9FGCoqCxS1g2iA4ofnu_j9mhJs/view?usp=sharing" target="_blank" rel="noreferrer" className="underline hover:opacity-80" style={{ color: "var(--accent)" }}>LUDA Code of Conduct and Expectations</a></li>
+          <li>Print and complete the <a href="https://drive.google.com/file/d/1uAtD2-YPFWQAbSwe_hFbvkqbi-GSJFfO/view?usp=sharing" target="_blank" rel="noreferrer" className="underline hover:opacity-80" style={{ color: "var(--accent)" }}>Student/Parent Contract</a></li>
+          <li>Print and complete the <a href="https://drive.google.com/file/d/1gQH94zi0zF-QqK4nRBmLhQ-iSABcQA_2/view?usp=sharing" target="_blank" rel="noreferrer" className="underline hover:opacity-80" style={{ color: "var(--accent)" }}>LUDA Medical Waiver</a></li>
+          <li>Pay the LUDA fee via <a href="https://checkout.square.site/merchant/MLWCQKJHS97D7/checkout/3W4TACCVURA7Q5ERURRQTYTG" target="_blank" rel="noreferrer" className="underline hover:opacity-80" style={{ color: "var(--accent)" }}>Square Checkout</a></li>
+        </ul>
+        <p className="mt-2 text-xs italic">Give your completed forms to the Coach.</p>
+      </div>
+    ),
   },
 ];
 
 const COSTS = [
-  { item: "Season Registration",   amount: "$75" },
-  { item: "Jersey (if needed)",    amount: "$30" },
-  { item: "Tournament Entry Fees", amount: "Included" },
-  { item: "Equipment",             amount: "Provided" },
+  { item: "Lakeville North High School Fee", amount: "$30.00" },
+  { item: "Minnesota Ultimate Membership",   amount: "$60.00" },
+  { item: "LUDA Registration Fee",           amount: "$310.50" },
 ];
 
 export default function RegisterPage() {
@@ -40,11 +54,11 @@ export default function RegisterPage() {
     <div className="max-w-3xl mx-auto px-6 py-16">
       <h1 className="text-4xl font-black mb-2" style={{ color: "var(--fg)" }}>Register</h1>
       <p className="font-semibold mb-12" style={{ color: "var(--fg-muted)" }}>
-        Join The Crayons for the 2026 season. Registration closes April 1st.
+        Join The Crayons. You will need to register with 3 organizations: LNHS, MN Ultimate, and LUDA.
       </p>
 
       {/* Steps */}
-      <h2 className="text-2xl font-black mb-6" style={{ color: "var(--fg)" }}>How to Register</h2>
+      <h2 className="text-2xl font-black mb-6" style={{ color: "var(--fg)" }}>What you&apos;ll need – 3 Steps to Register</h2>
       <div className="flex flex-col gap-5 mb-14">
         {STEPS.map((s) => (
           <div
@@ -60,7 +74,7 @@ export default function RegisterPage() {
             </div>
             <div>
               <p className="font-black text-lg mb-1" style={{ color: "var(--fg)" }}>{s.title}</p>
-              <p className="text-sm leading-relaxed" style={{ color: "var(--fg-muted)" }}>{s.body}</p>
+              <div className="text-sm leading-relaxed" style={{ color: "var(--fg-muted)" }}>{s.body}</div>
             </div>
           </div>
         ))}
@@ -89,13 +103,6 @@ export default function RegisterPage() {
 
       {/* CTA */}
       <div className="flex flex-col sm:flex-row gap-4">
-        <a
-          href="#"  // TODO: link to actual registration form
-          style={{ backgroundColor: "var(--accent)", color: "var(--accent-fg)" }}
-          className="flex-1 text-center px-8 py-4 rounded-3xl font-black text-lg hover:opacity-90 transition-opacity"
-        >
-          Register Now →
-        </a>
         <Link
           href="/contact"
           style={{ borderColor: "var(--accent)", color: "var(--accent)" }}

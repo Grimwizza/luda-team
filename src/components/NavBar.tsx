@@ -12,8 +12,7 @@ const NAV_LINKS = [
   { href: "/team",     label: "Team"     },
   { href: "/schedule", label: "Schedule" },
   { href: "/gallery",  label: "Gallery"  },
-  { href: "/news",     label: "News"     },
-  { href: "/alumni",   label: "Alumni"   },
+  { href: "/board",    label: "Board"    },
   { href: "/register", label: "Register" },
   { href: "/contact",  label: "Contact"  },
 ];
@@ -71,8 +70,22 @@ export function NavBar() {
           })}
         </div>
 
-        {/* Jersey Swap + hamburger */}
+        {/* Instagram + Jersey Swap + hamburger */}
         <div className="flex items-center gap-2">
+
+          {/* Instagram link */}
+          <a
+            href="https://www.instagram.com/lakevillenorthultimate/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="LUDA on Instagram"
+            title="@lakevillenorthultimate"
+            style={{ color: "var(--nav-fg)" }}
+            className="flex items-center justify-center w-9 h-9 rounded-2xl hover:opacity-70 transition-opacity"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/instagram-icon.png" alt="Instagram" className="w-5 h-5 rounded-md" />
+          </a>
 
           {/* Jersey Swap toggle */}
           <button
@@ -194,3 +207,5 @@ function XIcon({
     </svg>
   );
 }
+
+

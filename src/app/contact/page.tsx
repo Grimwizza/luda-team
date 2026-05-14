@@ -6,37 +6,38 @@ export const metadata: Metadata = {
 
 const CONTACTS = [
   {
-    label: "Head Coach",
-    name:  "Coach Name",
-    email: "coach@luda.team",
-    emoji: "🏃",
-  },
-  {
-    label: "Team Admin",
-    name:  "Admin Name",
-    email: "info@luda.team",
+    label: "Team Secretary",
+    name:  "Alison Skelly",
+    href:  "mailto:lakeville.ultimate@gmail.com",
+    cta:   "lakeville.ultimate@gmail.com",
     emoji: "📋",
   },
 ];
 
 const SOCIALS = [
   {
-    label: "Instagram",
-    handle: "@ludafrisbee",
-    href:   "https://www.instagram.com/lakevillenorthultimate/",
-    emoji:  "📸",
+    label:      "Instagram",
+    handle:     "@lakevillenorthultimate",
+    href:       "https://www.instagram.com/lakevillenorthultimate/",
+    emoji:      null,
+    icon:       "/instagram-icon.png",
+    badge:      null,
   },
   {
-    label: "Band App (Team Chat)",
-    handle: "Join the group",
-    href:   "#",  // TODO: Band app invite link
-    emoji:  "💬",
+    label:      "Band App – Team Chat",
+    handle:     "Join the group",
+    href:       "https://www.band.us/band/101047291/",
+    emoji:      null,
+    icon:       "/band-icon.png",
+    badge:      "Invite Only",
   },
   {
-    label: "Google Photos Album",
-    handle: "View all photos",
-    href:   "#",  // TODO: Google Photos link
-    emoji:  "🖼️",
+    label:      "Google Photos Album",
+    handle:     "View all photos",
+    href:       "https://photos.app.goo.gl/BQm2qTJqvwRpShR99",
+    emoji:      null,
+    icon:       "/google-photos-icon.png",
+    badge:      null,
   },
 ];
 
@@ -53,7 +54,7 @@ export default function ContactPage() {
       <div className="grid sm:grid-cols-2 gap-5 mb-14">
         {CONTACTS.map((c) => (
           <div
-            key={c.email}
+            key={c.name}
             style={{ backgroundColor: "var(--card-bg)", borderColor: "var(--card-border)" }}
             className="border rounded-3xl p-6"
           >
@@ -68,11 +69,11 @@ export default function ContactPage() {
             </p>
             <p className="font-black text-lg mb-1" style={{ color: "var(--fg)" }}>{c.name}</p>
             <a
-              href={`mailto:${c.email}`}
+              href={c.href}
               className="text-sm font-bold underline underline-offset-2 hover:opacity-70"
               style={{ color: "var(--accent)" }}
             >
-              {c.email}
+              {c.cta}
             </a>
           </div>
         ))}
@@ -90,9 +91,24 @@ export default function ContactPage() {
             style={{ backgroundColor: "var(--card-bg)", borderColor: "var(--card-border)" }}
             className="border rounded-3xl px-6 py-4 flex items-center gap-4 hover:shadow-md transition-shadow"
           >
-            <span className="text-2xl">{s.emoji}</span>
+            {"icon" in s && s.icon ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={s.icon} alt={s.label} className="w-8 h-8 rounded-lg" />
+            ) : (
+              <span className="text-2xl">{s.emoji}</span>
+            )}
             <div>
-              <p className="font-black text-sm" style={{ color: "var(--fg)" }}>{s.label}</p>
+              <div className="flex items-center gap-2 mb-0.5">
+                <p className="font-black text-sm" style={{ color: "var(--fg)" }}>{s.label}</p>
+                {s.badge && (
+                  <span
+                    className="text-xs font-bold px-2 py-0.5 rounded-full"
+                    style={{ backgroundColor: "var(--accent)", color: "var(--accent-fg)" }}
+                  >
+                    {s.badge}
+                  </span>
+                )}
+              </div>
               <p className="text-sm font-semibold" style={{ color: "var(--accent)" }}>{s.handle}</p>
             </div>
             <span className="ml-auto text-sm font-bold" style={{ color: "var(--fg-muted)" }}>→</span>
@@ -102,14 +118,43 @@ export default function ContactPage() {
 
       {/* Location */}
       <div
-        style={{ backgroundColor: "var(--bg-muted)", borderColor: "var(--card-border)" }}
-        className="mt-12 border rounded-3xl p-6 text-center"
+        style={{ borderColor: "var(--card-border)" }}
+        className="mt-12 border rounded-3xl overflow-hidden"
       >
-        <p className="text-2xl mb-2">📍</p>
-        <p className="font-black" style={{ color: "var(--fg)" }}>Based in Lakeville, MN</p>
-        <p className="text-sm mt-1" style={{ color: "var(--fg-muted)" }}>
-          We play at fields across the South Metro area.
-        </p>
+        <a
+          href="https://maps.google.com/?q=Lakeville+North+High+School,+19600+Ipava+Ave,+Lakeville,+MN+55044"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block"
+          aria-label="Open Lakeville North High School in Google Maps"
+        >
+          <iframe
+            src="https://maps.google.com/maps?q=Lakeville+North+High+School,+19600+Ipava+Ave,+Lakeville,+MN+55044&output=embed&z=15"
+            width="100%"
+            height="300"
+            style={{ border: 0, display: "block", pointerEvents: "none" }}
+            loading="lazy"
+            title="Lakeville North High School"
+          />
+        </a>
+        <div
+          style={{ backgroundColor: "var(--card-bg)", borderTopColor: "var(--card-border)" }}
+          className="border-t px-6 py-4 flex items-center justify-between"
+        >
+          <div>
+            <p className="font-black text-sm" style={{ color: "var(--fg)" }}>Lakeville North High School</p>
+            <p className="text-xs mt-0.5" style={{ color: "var(--fg-muted)" }}>19600 Ipava Ave, Lakeville, MN 55044</p>
+          </div>
+          <a
+            href="https://maps.google.com/?q=Lakeville+North+High+School,+19600+Ipava+Ave,+Lakeville,+MN+55044"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs font-bold px-4 py-2 rounded-2xl hover:opacity-80 transition-opacity shrink-0"
+            style={{ backgroundColor: "var(--accent)", color: "var(--accent-fg)" }}
+          >
+            Get Directions →
+          </a>
+        </div>
       </div>
     </div>
   );
