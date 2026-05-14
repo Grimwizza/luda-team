@@ -5,16 +5,52 @@ export const metadata: Metadata = {
 };
 
 const COACHES = [
-  { name: "Coach Name",  role: "Head Coach",       bio: "Bio coming soon." },
-  { name: "Coach Name",  role: "Assistant Coach",   bio: "Bio coming soon." },
+  { name: "Josh",   role: "Coach" },
+  { name: "Shelby", role: "Coach" },
+  { name: "Ish",    role: "Coach" },
 ];
 
-const PLAYERS = Array.from({ length: 12 }, (_, i) => ({
-  number: i + 1,
-  name:   "Player Name",
-  grade:  ["9th", "10th", "11th", "12th"][i % 4],
-  pos:    ["Handler", "Cutter", "Hybrid"][i % 3],
-}));
+const ROSTER: { grade: string; players: { number: string; name: string; captain?: boolean; returning?: boolean }[] }[] = [
+  {
+    grade: "Seniors",
+    players: [
+      { number: "23", name: "Owen Black",        returning: true },
+      { number: "01", name: "Nick Cavada",        returning: true, captain: true },
+      { number: "00", name: "Yushen Chen",        returning: true },
+      { number: "18", name: "Matthew Genz",       returning: true, captain: true },
+      { number: "09", name: "Eli Gunderson",      returning: true },
+      { number: "16", name: "Tyler Lowell",       returning: true },
+      { number: "29", name: "Whitney Szcorsik",   returning: true, captain: true },
+      { number: "05", name: "Drew Wood",          returning: true },
+    ],
+  },
+  {
+    grade: "Juniors",
+    players: [
+      { number: "19", name: "Joshua Ohlson" },
+      { number: "50", name: "Adam Ahmed",         returning: true },
+      { number: "71", name: "Nadia Binger",       returning: true },
+      { number: "17", name: "Logan Hebig",        returning: true },
+    ],
+  },
+  {
+    grade: "Sophomores",
+    players: [
+      { number: "13", name: "Evan Schaffhausen" },
+      { number: "51", name: "Nao Shimada" },
+      { number: "28", name: "Eden Luebbert",      returning: true },
+      { number: "08", name: "Ben Skelly",         returning: true },
+    ],
+  },
+  {
+    grade: "Freshmen",
+    players: [
+      { number: "24", name: "Madeline Binger" },
+      { number: "25", name: "Alex Ed" },
+      { number: "04", name: "Carson Szcorsik" },
+    ],
+  },
+];
 
 export default function TeamPage() {
   return (
@@ -189,44 +225,64 @@ export default function TeamPage() {
 
         {/* Coaches */}
         <h3 className="text-xl font-black mb-6" style={{ color: "var(--fg)" }}>Coaches</h3>
-        <div className="grid sm:grid-cols-2 gap-5 mb-14">
-          {COACHES.map((c, i) => (
+        <div className="grid sm:grid-cols-3 gap-5 mb-14">
+          {COACHES.map((c) => (
             <div
-              key={i}
+              key={c.name}
               style={{ backgroundColor: "var(--card-bg)", borderColor: "var(--card-border)" }}
-              className="border rounded-3xl p-6"
+              className="border rounded-3xl p-6 flex items-center gap-4"
             >
-              <div
-                className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl mb-4"
-                style={{ backgroundColor: "var(--accent)", color: "var(--accent-fg)" }}
-              >
-                🎯
+              <div className="w-12 h-12 rounded-2xl shrink-0 overflow-hidden flex items-center justify-center" style={{ backgroundColor: "var(--card-bg)" }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/LUDA-lite.gif" alt="LUDA" className="w-12 h-12 object-contain" />
               </div>
-              <p className="font-black text-lg" style={{ color: "var(--fg)" }}>{c.name}</p>
-              <p className="font-bold text-sm mb-2" style={{ color: "var(--accent)" }}>{c.role}</p>
-              <p className="text-sm" style={{ color: "var(--fg-muted)" }}>{c.bio}</p>
+              <div>
+                <p className="font-black text-lg" style={{ color: "var(--fg)" }}>{c.name}</p>
+                <p className="font-bold text-sm" style={{ color: "var(--accent)" }}>{c.role}</p>
+              </div>
             </div>
           ))}
         </div>
 
-        {/* Players */}
-        <h3 className="text-xl font-black mb-6" style={{ color: "var(--fg)" }}>Players</h3>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {PLAYERS.map((p) => (
-            <div
-              key={p.number}
-              style={{ backgroundColor: "var(--card-bg)", borderColor: "var(--card-border)" }}
-              className="border rounded-2xl p-4 flex items-center gap-4"
-            >
-              <div
-                className="w-12 h-12 rounded-xl flex items-center justify-center font-black text-lg shrink-0"
-                style={{ backgroundColor: "var(--accent)", color: "var(--accent-fg)" }}
-              >
-                #{p.number}
-              </div>
-              <div>
-                <p className="font-bold" style={{ color: "var(--fg)" }}>{p.name}</p>
-                <p className="text-sm" style={{ color: "var(--fg-muted)" }}>{p.grade} · {p.pos}</p>
+        {/* Players grouped by grade */}
+        <h3 className="text-xl font-black mb-8" style={{ color: "var(--fg)" }}>Players</h3>
+        <div className="flex flex-col gap-10">
+          {ROSTER.map(({ grade, players }) => (
+            <div key={grade}>
+              <p className="text-sm font-black uppercase tracking-widest mb-4" style={{ color: "var(--fg-muted)" }}>
+                {grade}
+              </p>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {players.map((p) => (
+                  <div
+                    key={p.number}
+                    style={{ backgroundColor: "var(--card-bg)", borderColor: "var(--card-border)" }}
+                    className="border rounded-2xl p-4 flex items-center gap-4"
+                  >
+                    <div
+                      className="w-12 h-12 rounded-xl flex items-center justify-center font-black text-lg shrink-0"
+                      style={{ backgroundColor: "var(--accent)", color: "var(--accent-fg)" }}
+                    >
+                      #{p.number}
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="font-bold" style={{ color: "var(--fg)" }}>{p.name}</p>
+                        {p.captain && (
+                          <span
+                            className="text-xs font-black px-2 py-0.5 rounded-full"
+                            style={{ backgroundColor: "var(--accent)", color: "var(--accent-fg)" }}
+                          >
+                            ★ C
+                          </span>
+                        )}
+                      </div>
+                      {p.returning && (
+                        <p className="text-xs font-bold mt-0.5" style={{ color: "var(--fg-muted)" }}>Returning</p>
+                      )}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           ))}
