@@ -79,7 +79,9 @@ export async function GET() {
     if (!item) return Response.json(null);
 
     const isAllDay = !item.start?.dateTime;
-    // All-day events: anchor to noon UTC so Chicago TZ formatting lands on the correct date
+    const eventTz = (item.start?.timeZone as string | undefined) ?? "America/Chicago";
+
+    // All-day events: anchor to noon UTC so TZ formatting lands on the correct date
     const startDate = isAllDay
       ? new Date(item.start.date + "T12:00:00Z")
       : new Date(item.start.dateTime);
@@ -88,14 +90,14 @@ export async function GET() {
       weekday: "short",
       month:   "short",
       day:     "numeric",
-      timeZone: "America/Chicago",
+      timeZone: eventTz,
     });
     const timeLabel = isAllDay
       ? null
       : startDate.toLocaleTimeString("en-US", {
           hour:     "numeric",
           minute:   "2-digit",
-          timeZone: "America/Chicago",
+          timeZone: eventTz,
         });
 
     const location = item.location as string | undefined;
@@ -118,31 +120,56 @@ export async function GET() {
     }
 
     // Step 3: Hourly weather from Open-Meteo (free, no key, up to 16 days)
-    let weather = null;
+    let weather: { hour: string; temp: number; label: string; emoji: string }[] | null = null;
     const daysUntil = (startDate.getTime() - Date.now()) / 86_400_000;
     if (daysUntil <= 14) {
       try {
         const eventDate = new Intl.DateTimeFormat("en-CA", {
-          timeZone: "America/Chicago",
+          timeZone: eventTz,
         }).format(startDate);
 
-        const wxUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&hourly=temperature_2m,weathercode&temperature_unit=fahrenheit&timezone=America%2FChicago&start_date=${eventDate}&end_date=${eventDate}`;
+        // Encode the IANA timezone name for use in the query string
+        const tzEncoded = encodeURIComponent(eventTz);
+        const wxUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&hourly=temperature_2m,weathercode&temperature_unit=fahrenheit&timezone=${tzEncoded}&start_date=${eventDate}&end_date=${eventDate}`;
         const wxRes = await fetch(wxUrl, { next: { revalidate: 900 } });
         const wx = await wxRes.json();
 
         if (wx.hourly?.temperature_2m) {
-          const parts = new Intl.DateTimeFormat("en-US", {
-            timeZone: "America/Chicago",
-            hour:     "2-digit",
-            hour12:   false,
-          }).formatToParts(startDate);
-          const hour = Math.min(23, Math.max(0,
-            parseInt(parts.find((p) => p.type === "hour")?.value ?? "12")
-          ));
-          weather = {
-            temp: Math.round(wx.hourly.temperature_2m[hour]),
-            ...wmoInfo(wx.hourly.weathercode[hour]),
+          const getHourInTz = (date: Date) => {
+            const parts = new Intl.DateTimeFormat("en-US", {
+              timeZone: eventTz,
+              hour:     "2-digit",
+              hour12:   false,
+            }).formatToParts(date);
+            return Math.min(23, Math.max(0,
+              parseInt(parts.find((p) => p.type === "hour")?.value ?? "12")
+            ));
           };
+
+          // Determine the hour range: start → end (or noon–8 PM for all-day)
+          const startHour = isAllDay ? 12 : getHourInTz(startDate);
+          let endHour: number;
+          if (isAllDay) {
+            endHour = 20;
+          } else if (item.end?.dateTime) {
+            endHour = Math.min(23, getHourInTz(new Date(item.end.dateTime)));
+          } else {
+            endHour = Math.min(23, startHour + 2);
+          }
+
+          weather = [];
+          for (let h = startHour; h <= endHour; h++) {
+            // Build a simple 12-hour label from the 0-23 hour index
+            const ampm = h < 12 ? "AM" : "PM";
+            const h12 = h % 12 || 12;
+            const label12 = `${h12} ${ampm}`;
+            weather.push({
+              hour:  label12,
+              temp:  Math.round(wx.hourly.temperature_2m[h]),
+              ...wmoInfo(wx.hourly.weathercode[h]),
+            });
+          }
+          if (weather.length === 0) weather = null;
         }
       } catch { /* weather unavailable, still show event */ }
     }

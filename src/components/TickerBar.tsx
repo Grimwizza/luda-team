@@ -10,10 +10,11 @@ interface TickerData {
     location: string | null;
   };
   weather: {
+    hour:  string;
     temp:  number;
     label: string;
     emoji: string;
-  } | null;
+  }[] | null;
 }
 
 export function TickerBar() {
@@ -38,8 +39,8 @@ export function TickerBar() {
       data.event.location,
     ].filter(Boolean).join("  ·  ");
 
-    const weatherPart = data.weather
-      ? `${data.weather.emoji} Game time forecast: ${data.weather.temp}°F  ·  ${data.weather.label}`
+    const weatherPart = data.weather?.length
+      ? `🌡 Hourly: ${data.weather.map((w) => `${w.hour} ${w.emoji} ${w.temp}°`).join("  ·  ")}`
       : null;
 
     text = [eventParts, weatherPart].filter(Boolean).join("          ");
