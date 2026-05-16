@@ -289,6 +289,16 @@ export default function TeamPage() {
         </div>
       </section>
 
+      <p className="text-sm mt-8" style={{ color: "var(--fg-muted)" }}>
+        <span
+          className="inline-flex items-center text-xs font-black px-2 py-0.5 rounded-full mr-2"
+          style={{ backgroundColor: "var(--accent)", color: "var(--accent-fg)" }}
+        >
+          ★ C
+        </span>
+        Captain
+      </p>
+
     </div>
   );
 }
