@@ -57,11 +57,14 @@ export function TickerBar() {
       `}</style>
       <div
         className="fixed bottom-0 left-0 right-0 z-30 h-9 overflow-hidden flex items-center"
-        style={{ backgroundColor: "#D00000" }}
+        style={{ backgroundColor: "var(--accent)" }}
         aria-label="Upcoming event ticker"
       >
         {data === undefined ? (
-          <div className="h-2.5 w-48 rounded-full bg-white/20 mx-auto animate-pulse" />
+          <div
+            className="h-2.5 w-48 rounded-full mx-auto animate-pulse"
+            style={{ backgroundColor: "var(--accent-fg)", opacity: 0.2 }}
+          />
         ) : (
           <div
             className="flex items-center"
@@ -72,7 +75,8 @@ export function TickerBar() {
             {[0, 1, 2].map((n) => (
               <span
                 key={n}
-                className="whitespace-nowrap text-white text-xs font-bold tracking-wide shrink-0 px-16"
+                className="whitespace-nowrap text-xs font-bold tracking-wide shrink-0 px-16"
+                style={{ color: "var(--accent-fg)" }}
               >
                 {text}
               </span>
