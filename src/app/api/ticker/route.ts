@@ -49,7 +49,7 @@ export async function GET() {
     const calParams = new URLSearchParams({
       key:          apiKey,
       timeMin:      timeMin.toISOString(),
-      maxResults:   "1",
+      maxResults:   "5", // fetch a small batch so we can skip events that already started
       singleEvents: "true",
       orderBy:      "startTime",
     });
@@ -62,7 +62,20 @@ export async function GET() {
     }
 
     const calData = await calRes.json();
-    const item = calData.items?.[0];
+
+    // Show the next event whose end time hasn't passed yet — so ongoing events
+    // remain visible but disappear from the ticker once they're over.
+    // All-day end.date is exclusive (day after last day), so use strict >.
+    const now = new Date();
+    const todayStr = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "America/Chicago",
+    }).format(now);
+
+    const item = (calData.items ?? []).find((ev: { end?: { dateTime?: string; date?: string } }) => {
+      if (ev.end?.dateTime) return new Date(ev.end.dateTime) > now;
+      return (ev.end?.date ?? "") > todayStr;
+    });
+
     if (!item) return Response.json(null);
 
     const isAllDay = !item.start?.dateTime;
