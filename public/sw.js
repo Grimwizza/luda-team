@@ -19,17 +19,20 @@ self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
   const url = new URL(e.request.url);
 
+  // Never intercept API routes — let them hit the network directly
+  if (url.pathname.startsWith('/api/')) return;
+
   // Next.js static chunks are content-addressed — safe to cache forever
   if (url.pathname.startsWith('/_next/static/')) {
     e.respondWith(
-      caches.match(e.request).then(
-        (hit) =>
-          hit ||
-          fetch(e.request).then((res) => {
-            caches.open(CACHE).then((c) => c.put(e.request, res.clone()));
-            return res;
-          })
-      )
+      caches.match(e.request).then((hit) => {
+        if (hit) return hit;
+        return fetch(e.request).then((res) => {
+          const clone = res.clone(); // clone synchronously before any async hand-off
+          caches.open(CACHE).then((c) => c.put(e.request, clone));
+          return res;
+        });
+      })
     );
     return;
   }
@@ -37,8 +40,8 @@ self.addEventListener('fetch', (e) => {
   // Navigation: network-first, fall back to cache
   if (e.request.mode === 'navigate') {
     e.respondWith(
-      fetch(e.request).catch(
-        () => caches.match(e.request).then((hit) => hit || caches.match('/'))
+      fetch(e.request).catch(() =>
+        caches.match(e.request).then((hit) => hit || caches.match('/').then((root) => root || Response.error()))
       )
     );
     return;
@@ -49,10 +52,13 @@ self.addEventListener('fetch', (e) => {
     e.respondWith(
       fetch(e.request)
         .then((res) => {
-          if (res.ok) caches.open(CACHE).then((c) => c.put(e.request, res.clone()));
+          if (res.ok) {
+            const clone = res.clone(); // clone synchronously before any async hand-off
+            caches.open(CACHE).then((c) => c.put(e.request, clone));
+          }
           return res;
         })
-        .catch(() => caches.match(e.request))
+        .catch(() => caches.match(e.request).then((hit) => hit || Response.error()))
     );
   }
 });
