@@ -6,6 +6,7 @@ import { NavBar } from "@/components/NavBar";
 import { Footer } from "@/components/Footer";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 import { InstallPrompt } from "@/components/InstallPrompt";
+import { TickerBar } from "@/components/TickerBar";
 import React from "react";
 
 const nunito = Nunito({
@@ -38,9 +39,10 @@ export default function RootLayout({
       <body>
         <ThemeProvider>
           <NavBar />
-          <main className="flex-1 pt-16">{children}</main>
+          <main className="flex-1 pt-16 pb-9">{children}</main>
           <Footer />
           <InstallPrompt />
+          <TickerBar />
         </ThemeProvider>
         <ServiceWorkerRegister />
       </body>

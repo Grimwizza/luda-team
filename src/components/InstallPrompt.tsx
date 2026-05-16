@@ -70,7 +70,7 @@ export function InstallPrompt() {
   return (
     <>
       {showBanner && (
-        <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-100 shadow-[0_-4px_20px_rgba(0,0,0,0.10)]">
+        <div className="md:hidden fixed bottom-9 left-0 right-0 z-50 bg-white border-t border-gray-100 shadow-[0_-4px_20px_rgba(0,0,0,0.10)]">
           <div className="p-4 max-w-sm mx-auto">
             {showSteps ? (
               <div className="space-y-3">
@@ -131,7 +131,7 @@ export function InstallPrompt() {
       {showFab && (
         <button
           onClick={handleFabClick}
-          className="md:hidden fixed bottom-6 right-4 z-50 flex items-center gap-2 bg-[#D00000] text-white text-sm font-semibold px-4 py-2.5 rounded-full shadow-lg"
+          className="md:hidden fixed bottom-12 right-4 z-50 flex items-center gap-2 bg-[#D00000] text-white text-sm font-semibold px-4 py-2.5 rounded-full shadow-lg"
           aria-label="Add to Home Screen"
         >
           <svg
