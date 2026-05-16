@@ -78,7 +78,7 @@ function parseSchedule(description: string): GameSlot[] {
   return slots;
 }
 
-// Returns an ordered list of YYYY-MM-DD strings from startISO (inclusive) to endISO (exclusive).
+// Returns ordered YYYY-MM-DD strings from startISO (inclusive) to endISO (exclusive).
 function buildDateRange(startISO: string, endISO: string): string[] {
   const dates: string[] = [];
   let cur = startISO;
@@ -96,6 +96,9 @@ function hourLabel(h: number, m: number): string {
   const h12  = h % 12 || 12;
   return m === 0 ? `${h12} ${ampm}` : `${h12}:${m.toString().padStart(2, "0")} ${ampm}`;
 }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type CalItem = Record<string, any>;
 
 export async function GET() {
   const apiKey = process.env.GOOGLE_CALENDAR_API_KEY;
@@ -125,72 +128,94 @@ export async function GET() {
     }
 
     const calData = await calRes.json();
-
-    // Show the next event whose end time hasn't passed yet — ongoing events stay visible
-    // until they're over. All-day end.date is exclusive (day after last day).
     const now = new Date();
-    const todayStr = new Intl.DateTimeFormat("en-CA", {
-      timeZone: "America/Chicago",
-    }).format(now);
 
-    const item = (calData.items ?? []).find((ev: { end?: { dateTime?: string; date?: string } }) => {
-      if (ev.end?.dateTime) return new Date(ev.end.dateTime) > now;
-      return (ev.end?.date ?? "") > todayStr;
-    });
+    // Walk calendar items (sorted by startTime) to find the first one that is
+    // still worth showing. For tournament events past the 90-min cutoff on the
+    // last game day, skip to the next calendar event instead of staying stuck.
+    let item:             CalItem | null = null;
+    let isAllDay          = false;
+    let eventTz           = "America/Chicago";
+    let startDate         = new Date();
+    let relevantISO       = "";
+    let selectedGameSlots: GameSlot[] = [];
 
-    if (!item) return Response.json(null);
+    for (const ev of (calData.items ?? []) as CalItem[]) {
+      const evIsAllDay = !ev.start?.dateTime;
+      const evTz       = (ev.start?.timeZone as string | undefined) ?? "America/Chicago";
 
-    const isAllDay = !item.start?.dateTime;
-    const eventTz  = (item.start?.timeZone as string | undefined) ?? "America/Chicago";
+      const evStartDate = evIsAllDay
+        ? new Date((ev.start.date as string) + "T12:00:00Z")
+        : new Date(ev.start.dateTime as string);
 
-    // All-day events: anchor to noon UTC so TZ formatting lands on the correct date
-    const startDate = isAllDay
-      ? new Date(item.start.date + "T12:00:00Z")
-      : new Date(item.start.dateTime);
+      const evDateFmt    = new Intl.DateTimeFormat("en-CA", { timeZone: evTz });
+      const evDayNameFmt = new Intl.DateTimeFormat("en-US", { timeZone: evTz, weekday: "long" });
 
-    const dateFormatter    = new Intl.DateTimeFormat("en-CA", { timeZone: eventTz });
-    const dayNameFormatter = new Intl.DateTimeFormat("en-US", { timeZone: eventTz, weekday: "long" });
+      // For all-day events the calendar stores plain local date strings — use them
+      // directly to avoid midnight-UTC boundary issues when comparing dates.
+      const evStartISO  = evIsAllDay ? (ev.start.date as string) : evDateFmt.format(evStartDate);
+      const evEndISO    = evIsAllDay ? (ev.end.date   as string) : evDateFmt.format(new Date(ev.end.dateTime as string));
+      const todayInEvTz = evDateFmt.format(now);
 
-    // For all-day events use the raw calendar date strings (already in local calendar dates).
-    // For timed events derive from the datetime.
-    const eventStartISO = isAllDay ? (item.start.date as string) : dateFormatter.format(startDate);
-    const eventEndISO   = isAllDay ? (item.end.date   as string) : dateFormatter.format(new Date(item.end.dateTime));
-    const todayISO      = dateFormatter.format(now);
+      // Skip events whose end has already passed
+      if (ev.end?.dateTime) {
+        if (new Date(ev.end.dateTime as string) <= now) continue;
+      } else {
+        if ((ev.end?.date ?? "") <= todayInEvTz) continue;
+      }
 
-    // Parse game schedule from description (populated for tournaments)
-    const gameSlots = parseSchedule((item.description as string | undefined) ?? "");
+      // Default relevant date: today if within event range, else the first event day
+      let evRelevantISO = (todayInEvTz >= evStartISO && todayInEvTz < evEndISO)
+        ? todayInEvTz
+        : evStartISO;
 
-    // Which date's games/weather to show:
-    // Default = today if within event range, otherwise the first event day.
-    let relevantISO = (todayISO >= eventStartISO && todayISO < eventEndISO)
-      ? todayISO
-      : eventStartISO;
+      // For tournament events with a game schedule, check the 90-min cutoff
+      const evGameSlots = parseSchedule((ev.description as string | undefined) ?? "");
+      let skipThisEvent = false;
 
-    // For tournaments: advance to the next event day 90 min after today's last game ends.
-    if (relevantISO === todayISO && gameSlots.length > 0) {
-      const todayDayName = dayNameFormatter.format(new Date(todayISO + "T12:00:00Z"));
-      const todayGames   = gameSlots.filter(
-        (g) => g.dayName.toLowerCase() === todayDayName.toLowerCase()
-      );
-      if (todayGames.length > 0) {
-        const last = todayGames[todayGames.length - 1];
-        const nowParts = new Intl.DateTimeFormat("en-US", {
-          timeZone: eventTz, hour: "2-digit", minute: "2-digit", hour12: false,
-        }).formatToParts(now);
-        const nowMins  = parseInt(nowParts.find((p) => p.type === "hour")?.value   ?? "0") * 60
-                       + parseInt(nowParts.find((p) => p.type === "minute")?.value ?? "0");
-        const cutoff   = last.hour * 60 + last.minute + 90;
-        if (nowMins >= cutoff) {
-          const eventDates = buildDateRange(eventStartISO, eventEndISO);
-          const idx = eventDates.indexOf(todayISO);
-          if (idx >= 0 && idx + 1 < eventDates.length) {
-            relevantISO = eventDates[idx + 1];
+      if (evRelevantISO === todayInEvTz && evGameSlots.length > 0) {
+        const todayDayName = evDayNameFmt.format(new Date(todayInEvTz + "T12:00:00Z"));
+        const todayGames   = evGameSlots.filter(
+          (g) => g.dayName.toLowerCase() === todayDayName.toLowerCase()
+        );
+
+        if (todayGames.length > 0) {
+          const last = todayGames[todayGames.length - 1];
+          const nowParts = new Intl.DateTimeFormat("en-US", {
+            timeZone: evTz, hour: "2-digit", minute: "2-digit", hour12: false,
+          }).formatToParts(now);
+          const nowMins  = parseInt(nowParts.find((p) => p.type === "hour")?.value   ?? "0") * 60
+                         + parseInt(nowParts.find((p) => p.type === "minute")?.value ?? "0");
+          const cutoff   = last.hour * 60 + last.minute + 90;
+
+          if (nowMins >= cutoff) {
+            // Try to advance within this event to the next event day
+            const eventDates = buildDateRange(evStartISO, evEndISO);
+            const idx = eventDates.indexOf(todayInEvTz);
+            if (idx >= 0 && idx + 1 < eventDates.length) {
+              evRelevantISO = eventDates[idx + 1]; // show next day of this event
+            } else {
+              skipThisEvent = true; // no more days here — fall through to next calendar event
+            }
           }
         }
       }
+
+      if (skipThisEvent) continue;
+
+      // Found the event to display
+      item             = ev;
+      isAllDay         = evIsAllDay;
+      eventTz          = evTz;
+      startDate        = evStartDate;
+      relevantISO      = evRelevantISO;
+      selectedGameSlots = evGameSlots;
+      break;
     }
 
-    // Date label reflects the relevant day, not necessarily the event start
+    if (!item) return Response.json(null);
+
+    // Date label reflects the relevant day (may differ from event start for multi-day tournaments)
     const dateLabel = new Date(relevantISO + "T12:00:00Z").toLocaleDateString("en-US", {
       weekday: "short",
       month:   "short",
@@ -247,10 +272,11 @@ export async function GET() {
           };
 
           // Tournament mode: weather at each game's scheduled start time
-          if (gameSlots.length > 0) {
-            const relevantDayName = dayNameFormatter.format(new Date(relevantISO + "T12:00:00Z"));
-            const dayGames = gameSlots.filter(
-              (g) => g.dayName.toLowerCase() === relevantDayName.toLowerCase()
+          if (selectedGameSlots.length > 0) {
+            const dayNameFmt   = new Intl.DateTimeFormat("en-US", { timeZone: eventTz, weekday: "long" });
+            const relevantDay  = dayNameFmt.format(new Date(relevantISO + "T12:00:00Z"));
+            const dayGames     = selectedGameSlots.filter(
+              (g) => g.dayName.toLowerCase() === relevantDay.toLowerCase()
             );
             if (dayGames.length > 0) {
               weather = dayGames.map((g) => ({
