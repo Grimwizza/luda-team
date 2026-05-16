@@ -10,7 +10,8 @@ interface TickerData {
     location: string | null;
   };
   weather: {
-    hour:  string;
+    time:  string;
+    field: string | null;
     temp:  number;
     label: string;
     emoji: string;
@@ -40,7 +41,7 @@ export function TickerBar() {
     ].filter(Boolean).join("  ·  ");
 
     const weatherPart = data.weather?.length
-      ? `🌡 Hourly: ${data.weather.map((w) => `${w.hour} ${w.emoji} ${w.temp}°`).join("  ·  ")}`
+      ? `🌡 ${data.weather.map((w) => [w.field, w.time, `${w.emoji} ${w.temp}°`].filter(Boolean).join(" ")).join("  ·  ")}`
       : null;
 
     text = [eventParts, weatherPart].filter(Boolean).join("          ");

@@ -34,6 +34,56 @@ function wmoInfo(code: number) {
   return k != null ? WMO[k] : { label: "Unknown", emoji: "🌡️" };
 }
 
+interface GameSlot {
+  dayName: string;  // "Saturday"
+  hour:    number;  // 0-23
+  minute:  number;
+  field:   string | null;
+}
+
+// Parse lines like "Saturday:\n8:00 Field#6\n9:40 Field#7" from a calendar description.
+// Handles HTML that Google Calendar sometimes injects.
+function parseSchedule(description: string): GameSlot[] {
+  const text = description
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&nbsp;/g, " ");
+
+  const slots: GameSlot[] = [];
+  let currentDay = "";
+
+  for (const rawLine of text.split(/[\n\r]+/)) {
+    const line = rawLine.trim();
+    if (!line) continue;
+
+    // Day header: "Saturday:" / "Saturday" / "Saturday -"
+    const dayMatch = line.match(/^(Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday)[:\s-]*$/i);
+    if (dayMatch) {
+      currentDay = dayMatch[1][0].toUpperCase() + dayMatch[1].slice(1).toLowerCase();
+      continue;
+    }
+
+    // Game line: "8:00 Field#6" or "9:40 Field #7" or "11:20 Field#8"
+    const gameMatch = line.match(/^(\d{1,2}):(\d{2})\s+Field\s*#?(\w+)/i);
+    if (gameMatch && currentDay) {
+      slots.push({
+        dayName: currentDay,
+        hour:    parseInt(gameMatch[1]),
+        minute:  parseInt(gameMatch[2]),
+        field:   `Field #${gameMatch[3]}`,
+      });
+    }
+  }
+
+  return slots;
+}
+
+function hourLabel(h: number, m: number): string {
+  const ampm = h < 12 ? "AM" : "PM";
+  const h12  = h % 12 || 12;
+  return m === 0 ? `${h12} ${ampm}` : `${h12}:${m.toString().padStart(2, "0")} ${ampm}`;
+}
+
 export async function GET() {
   const apiKey = process.env.GOOGLE_CALENDAR_API_KEY;
   if (!apiKey) return Response.json(null);
@@ -79,12 +129,17 @@ export async function GET() {
     if (!item) return Response.json(null);
 
     const isAllDay = !item.start?.dateTime;
-    const eventTz = (item.start?.timeZone as string | undefined) ?? "America/Chicago";
+    const eventTz  = (item.start?.timeZone as string | undefined) ?? "America/Chicago";
 
     // All-day events: anchor to noon UTC so TZ formatting lands on the correct date
     const startDate = isAllDay
       ? new Date(item.start.date + "T12:00:00Z")
       : new Date(item.start.dateTime);
+
+    // End date used for day-range calculations (exclusive for all-day)
+    const endDateExclusive = isAllDay
+      ? new Date(item.end.date + "T00:00:00Z")
+      : new Date(item.end.dateTime);
 
     const dateLabel = startDate.toLocaleDateString("en-US", {
       weekday: "short",
@@ -119,20 +174,29 @@ export async function GET() {
       } catch { /* fall back to Lakeville */ }
     }
 
-    // Step 3: Hourly weather from Open-Meteo (free, no key, up to 16 days)
-    let weather: { hour: string; temp: number; label: string; emoji: string }[] | null = null;
+    // Step 3: Weather from Open-Meteo (free, no key, up to 16 days)
+    type WeatherEntry = { time: string; field: string | null; temp: number; label: string; emoji: string };
+    let weather: WeatherEntry[] | null = null;
+
     const daysUntil = (startDate.getTime() - Date.now()) / 86_400_000;
     if (daysUntil <= 14) {
       try {
-        const eventDate = new Intl.DateTimeFormat("en-CA", {
-          timeZone: eventTz,
-        }).format(startDate);
+        const dateFormatter   = new Intl.DateTimeFormat("en-CA", { timeZone: eventTz });
+        const dayNameFormatter = new Intl.DateTimeFormat("en-US", { timeZone: eventTz, weekday: "long" });
 
-        // Encode the IANA timezone name for use in the query string
+        // Which date to fetch weather for:
+        // today if the event is already underway, otherwise the first day of the event.
+        const eventStartISO = dateFormatter.format(startDate);
+        const todayISO      = dateFormatter.format(now);
+        const eventEndISO   = dateFormatter.format(endDateExclusive);
+        const relevantISO   = (todayISO >= eventStartISO && todayISO < eventEndISO)
+          ? todayISO
+          : eventStartISO;
+
         const tzEncoded = encodeURIComponent(eventTz);
-        const wxUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&hourly=temperature_2m,weathercode&temperature_unit=fahrenheit&timezone=${tzEncoded}&start_date=${eventDate}&end_date=${eventDate}`;
+        const wxUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&hourly=temperature_2m,weathercode&temperature_unit=fahrenheit&timezone=${tzEncoded}&start_date=${relevantISO}&end_date=${relevantISO}`;
         const wxRes = await fetch(wxUrl, { next: { revalidate: 900 } });
-        const wx = await wxRes.json();
+        const wx    = await wxRes.json();
 
         if (wx.hourly?.temperature_2m) {
           const getHourInTz = (date: Date) => {
@@ -146,30 +210,36 @@ export async function GET() {
             ));
           };
 
-          // Determine the hour range: start → end (or noon–8 PM for all-day)
-          const startHour = isAllDay ? 12 : getHourInTz(startDate);
-          let endHour: number;
-          if (isAllDay) {
-            endHour = 20;
-          } else if (item.end?.dateTime) {
-            endHour = Math.min(23, getHourInTz(new Date(item.end.dateTime)));
-          } else {
-            endHour = Math.min(23, startHour + 2);
+          // Tournament mode: parse game start times from the description
+          const gameSlots = parseSchedule((item.description as string | undefined) ?? "");
+          if (gameSlots.length > 0) {
+            // Map the relevant date back to a day name ("Saturday") to filter slots
+            // Use noon UTC on that date to avoid DST/midnight boundary issues
+            const relevantDayName = dayNameFormatter.format(new Date(relevantISO + "T12:00:00Z"));
+            const dayGames = gameSlots.filter(
+              (g) => g.dayName.toLowerCase() === relevantDayName.toLowerCase()
+            );
+
+            if (dayGames.length > 0) {
+              weather = dayGames.map((g) => ({
+                time:  hourLabel(g.hour, g.minute),
+                field: g.field,
+                temp:  Math.round(wx.hourly.temperature_2m[Math.min(23, g.hour)]),
+                ...wmoInfo(wx.hourly.weathercode[Math.min(23, g.hour)]),
+              }));
+            }
           }
 
-          weather = [];
-          for (let h = startHour; h <= endHour; h++) {
-            // Build a simple 12-hour label from the 0-23 hour index
-            const ampm = h < 12 ? "AM" : "PM";
-            const h12 = h % 12 || 12;
-            const label12 = `${h12} ${ampm}`;
-            weather.push({
-              hour:  label12,
-              temp:  Math.round(wx.hourly.temperature_2m[h]),
-              ...wmoInfo(wx.hourly.weathercode[h]),
-            });
+          // Fallback: single weather snapshot at event start time
+          if (!weather) {
+            const startHour = isAllDay ? 12 : getHourInTz(startDate);
+            weather = [{
+              time:  timeLabel ?? hourLabel(startHour, 0),
+              field: null,
+              temp:  Math.round(wx.hourly.temperature_2m[startHour]),
+              ...wmoInfo(wx.hourly.weathercode[startHour]),
+            }];
           }
-          if (weather.length === 0) weather = null;
         }
       } catch { /* weather unavailable, still show event */ }
     }
