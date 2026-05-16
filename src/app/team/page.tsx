@@ -47,7 +47,7 @@ const ROSTER: { grade: string; players: { number: string; name: string; captain?
     players: [
       { number: "24", name: "Madeline Binger" },
       { number: "25", name: "Alex Ed" },
-      { number: "04", name: "Carson Szcorsik" },
+      { number: "44", name: "Carson Szcorsik" },
     ],
   },
 ];
