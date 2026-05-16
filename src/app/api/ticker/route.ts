@@ -40,17 +40,26 @@ export async function GET() {
 
   try {
     // Step 1: Next calendar event
-    const calUrl = new URL(
-      `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(CALENDAR_ID)}/events`
-    );
-    calUrl.searchParams.set("key", apiKey);
-    calUrl.searchParams.set("timeMin", new Date().toISOString());
-    calUrl.searchParams.set("maxResults", "1");
-    calUrl.searchParams.set("singleEvents", "true");
-    calUrl.searchParams.set("orderBy", "startTime");
+    // Round to the nearest 15-min boundary so the fetch cache key is stable
+    const timeMin = new Date();
+    timeMin.setMinutes(Math.floor(timeMin.getMinutes() / 15) * 15, 0, 0);
 
-    const calRes = await fetch(calUrl.toString(), { next: { revalidate: 900 } });
-    if (!calRes.ok) return Response.json(null);
+    // Build URL via template literal — new URL() would decode %40 → @ in the path,
+    // which the Calendar API rejects. URLSearchParams handles query encoding separately.
+    const calParams = new URLSearchParams({
+      key:          apiKey,
+      timeMin:      timeMin.toISOString(),
+      maxResults:   "1",
+      singleEvents: "true",
+      orderBy:      "startTime",
+    });
+    const calUrl = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(CALENDAR_ID)}/events?${calParams}`;
+
+    const calRes = await fetch(calUrl, { next: { revalidate: 900 } });
+    if (!calRes.ok) {
+      console.error("[ticker] Calendar API error:", calRes.status, await calRes.text());
+      return Response.json(null);
+    }
 
     const calData = await calRes.json();
     const item = calData.items?.[0];
