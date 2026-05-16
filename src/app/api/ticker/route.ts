@@ -35,7 +35,7 @@ function wmoInfo(code: number) {
 }
 
 interface GameSlot {
-  dayName: string;  // "Saturday"
+  dayName: string;  // e.g. "Saturday"
   hour:    number;  // 0-23
   minute:  number;
   field:   string | null;
@@ -63,7 +63,7 @@ function parseSchedule(description: string): GameSlot[] {
       continue;
     }
 
-    // Game line: "8:00 Field#6" or "9:40 Field #7" or "11:20 Field#8"
+    // Game line: "8:00 Field#6" or "9:40 Field #7"
     const gameMatch = line.match(/^(\d{1,2}):(\d{2})\s+Field\s*#?(\w+)/i);
     if (gameMatch && currentDay) {
       slots.push({
@@ -76,6 +76,19 @@ function parseSchedule(description: string): GameSlot[] {
   }
 
   return slots;
+}
+
+// Returns an ordered list of YYYY-MM-DD strings from startISO (inclusive) to endISO (exclusive).
+function buildDateRange(startISO: string, endISO: string): string[] {
+  const dates: string[] = [];
+  let cur = startISO;
+  while (cur < endISO) {
+    dates.push(cur);
+    const d = new Date(cur + "T00:00:00Z");
+    d.setUTCDate(d.getUTCDate() + 1);
+    cur = d.toISOString().slice(0, 10);
+  }
+  return dates;
 }
 
 function hourLabel(h: number, m: number): string {
@@ -99,7 +112,7 @@ export async function GET() {
     const calParams = new URLSearchParams({
       key:          apiKey,
       timeMin:      timeMin.toISOString(),
-      maxResults:   "5", // fetch a small batch so we can skip events that already started
+      maxResults:   "5",
       singleEvents: "true",
       orderBy:      "startTime",
     });
@@ -113,9 +126,8 @@ export async function GET() {
 
     const calData = await calRes.json();
 
-    // Show the next event whose end time hasn't passed yet — so ongoing events
-    // remain visible but disappear from the ticker once they're over.
-    // All-day end.date is exclusive (day after last day), so use strict >.
+    // Show the next event whose end time hasn't passed yet — ongoing events stay visible
+    // until they're over. All-day end.date is exclusive (day after last day).
     const now = new Date();
     const todayStr = new Intl.DateTimeFormat("en-CA", {
       timeZone: "America/Chicago",
@@ -136,12 +148,50 @@ export async function GET() {
       ? new Date(item.start.date + "T12:00:00Z")
       : new Date(item.start.dateTime);
 
-    // End date used for day-range calculations (exclusive for all-day)
-    const endDateExclusive = isAllDay
-      ? new Date(item.end.date + "T00:00:00Z")
-      : new Date(item.end.dateTime);
+    const dateFormatter    = new Intl.DateTimeFormat("en-CA", { timeZone: eventTz });
+    const dayNameFormatter = new Intl.DateTimeFormat("en-US", { timeZone: eventTz, weekday: "long" });
 
-    const dateLabel = startDate.toLocaleDateString("en-US", {
+    // For all-day events use the raw calendar date strings (already in local calendar dates).
+    // For timed events derive from the datetime.
+    const eventStartISO = isAllDay ? (item.start.date as string) : dateFormatter.format(startDate);
+    const eventEndISO   = isAllDay ? (item.end.date   as string) : dateFormatter.format(new Date(item.end.dateTime));
+    const todayISO      = dateFormatter.format(now);
+
+    // Parse game schedule from description (populated for tournaments)
+    const gameSlots = parseSchedule((item.description as string | undefined) ?? "");
+
+    // Which date's games/weather to show:
+    // Default = today if within event range, otherwise the first event day.
+    let relevantISO = (todayISO >= eventStartISO && todayISO < eventEndISO)
+      ? todayISO
+      : eventStartISO;
+
+    // For tournaments: advance to the next event day 90 min after today's last game ends.
+    if (relevantISO === todayISO && gameSlots.length > 0) {
+      const todayDayName = dayNameFormatter.format(new Date(todayISO + "T12:00:00Z"));
+      const todayGames   = gameSlots.filter(
+        (g) => g.dayName.toLowerCase() === todayDayName.toLowerCase()
+      );
+      if (todayGames.length > 0) {
+        const last = todayGames[todayGames.length - 1];
+        const nowParts = new Intl.DateTimeFormat("en-US", {
+          timeZone: eventTz, hour: "2-digit", minute: "2-digit", hour12: false,
+        }).formatToParts(now);
+        const nowMins  = parseInt(nowParts.find((p) => p.type === "hour")?.value   ?? "0") * 60
+                       + parseInt(nowParts.find((p) => p.type === "minute")?.value ?? "0");
+        const cutoff   = last.hour * 60 + last.minute + 90;
+        if (nowMins >= cutoff) {
+          const eventDates = buildDateRange(eventStartISO, eventEndISO);
+          const idx = eventDates.indexOf(todayISO);
+          if (idx >= 0 && idx + 1 < eventDates.length) {
+            relevantISO = eventDates[idx + 1];
+          }
+        }
+      }
+    }
+
+    // Date label reflects the relevant day, not necessarily the event start
+    const dateLabel = new Date(relevantISO + "T12:00:00Z").toLocaleDateString("en-US", {
       weekday: "short",
       month:   "short",
       day:     "numeric",
@@ -181,18 +231,6 @@ export async function GET() {
     const daysUntil = (startDate.getTime() - Date.now()) / 86_400_000;
     if (daysUntil <= 14) {
       try {
-        const dateFormatter   = new Intl.DateTimeFormat("en-CA", { timeZone: eventTz });
-        const dayNameFormatter = new Intl.DateTimeFormat("en-US", { timeZone: eventTz, weekday: "long" });
-
-        // Which date to fetch weather for:
-        // today if the event is already underway, otherwise the first day of the event.
-        const eventStartISO = dateFormatter.format(startDate);
-        const todayISO      = dateFormatter.format(now);
-        const eventEndISO   = dateFormatter.format(endDateExclusive);
-        const relevantISO   = (todayISO >= eventStartISO && todayISO < eventEndISO)
-          ? todayISO
-          : eventStartISO;
-
         const tzEncoded = encodeURIComponent(eventTz);
         const wxUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&hourly=temperature_2m,weathercode&temperature_unit=fahrenheit&timezone=${tzEncoded}&start_date=${relevantISO}&end_date=${relevantISO}`;
         const wxRes = await fetch(wxUrl, { next: { revalidate: 900 } });
@@ -201,25 +239,19 @@ export async function GET() {
         if (wx.hourly?.temperature_2m) {
           const getHourInTz = (date: Date) => {
             const parts = new Intl.DateTimeFormat("en-US", {
-              timeZone: eventTz,
-              hour:     "2-digit",
-              hour12:   false,
+              timeZone: eventTz, hour: "2-digit", hour12: false,
             }).formatToParts(date);
             return Math.min(23, Math.max(0,
               parseInt(parts.find((p) => p.type === "hour")?.value ?? "12")
             ));
           };
 
-          // Tournament mode: parse game start times from the description
-          const gameSlots = parseSchedule((item.description as string | undefined) ?? "");
+          // Tournament mode: weather at each game's scheduled start time
           if (gameSlots.length > 0) {
-            // Map the relevant date back to a day name ("Saturday") to filter slots
-            // Use noon UTC on that date to avoid DST/midnight boundary issues
             const relevantDayName = dayNameFormatter.format(new Date(relevantISO + "T12:00:00Z"));
             const dayGames = gameSlots.filter(
               (g) => g.dayName.toLowerCase() === relevantDayName.toLowerCase()
             );
-
             if (dayGames.length > 0) {
               weather = dayGames.map((g) => ({
                 time:  hourLabel(g.hour, g.minute),
@@ -230,7 +262,7 @@ export async function GET() {
             }
           }
 
-          // Fallback: single weather snapshot at event start time
+          // Fallback: single snapshot at event start time (practices, non-tournament events)
           if (!weather) {
             const startHour = isAllDay ? 12 : getHourInTz(startDate);
             weather = [{
