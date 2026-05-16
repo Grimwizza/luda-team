@@ -30,7 +30,7 @@ const ROSTER: { grade: string; players: { number: string; name: string; captain?
       { number: "19", name: "Joshua Ohlson" },
       { number: "50", name: "Adam Ahmed",         returning: true },
       { number: "71", name: "Nadia Binger",       returning: true },
-      { number: "17", name: "Logan Hebig",        returning: true },
+      { number: "17", name: "Logan Hebig",        returning: true, captain: true },
     ],
   },
   {
