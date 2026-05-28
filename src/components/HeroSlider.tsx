@@ -91,15 +91,16 @@ interface HeroSliderProps {
 }
 
 export function HeroSlider({ slides = DEFAULT_SLIDES }: HeroSliderProps) {
+  const [shuffled] = useState<Slide[]>(() => [...slides].sort(() => Math.random() - 0.5));
   const [current, setCurrent] = useState(0);
   const [paused, setPaused] = useState(false);
   const [animKeys, setAnimKeys] = useState<number[]>(() =>
-    slides.map((_, i) => (i === 0 ? 1 : 0))
+    shuffled.map((_, i) => (i === 0 ? 1 : 0))
   );
   const [textKey, setTextKey] = useState(0);
   const touchStartX = useRef<number | null>(null);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
-  const count = slides.length;
+  const count = shuffled.length;
 
   const goTo = useCallback((index: number) => {
     setCurrent(index);
@@ -122,19 +123,19 @@ export function HeroSlider({ slides = DEFAULT_SLIDES }: HeroSliderProps) {
   }, [advance]);
 
   useEffect(() => {
-    if (paused || slides[current].type !== "image") return;
+    if (paused || shuffled[current].type !== "image") return;
     const id = setTimeout(advance, 5000);
     return () => clearTimeout(id);
-  }, [paused, advance, current, slides]);
+  }, [paused, advance, current, shuffled]);
 
   useEffect(() => {
-    if (paused || slides[current].type !== "video") return;
+    if (paused || shuffled[current].type !== "video") return;
     const id = setTimeout(advance, 30_000);
     return () => clearTimeout(id);
-  }, [paused, advance, current, slides]);
+  }, [paused, advance, current, shuffled]);
 
   useEffect(() => {
-    slides.forEach((slide, i) => {
+    shuffled.forEach((slide, i) => {
       if (slide.type !== "video") return;
       const vid = videoRefs.current[i];
       if (!vid) return;
@@ -149,7 +150,7 @@ export function HeroSlider({ slides = DEFAULT_SLIDES }: HeroSliderProps) {
         vid.currentTime = 0;
       }
     });
-  }, [current, paused, slides]);
+  }, [current, paused, shuffled]);
 
   const onTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
@@ -217,7 +218,7 @@ export function HeroSlider({ slides = DEFAULT_SLIDES }: HeroSliderProps) {
         onTouchEnd={onTouchEnd}
         aria-label="Hero slider"
       >
-        {slides.map((slide, i) => {
+        {shuffled.map((slide, i) => {
           const isActive = i === current;
           const kb = kbStyle(isActive, animKeys[i], slide.kenBurnsDirection);
           return (
@@ -285,14 +286,14 @@ export function HeroSlider({ slides = DEFAULT_SLIDES }: HeroSliderProps) {
                 textShadow: "0 2px 20px rgba(0,0,0,0.55),0 1px 4px rgba(0,0,0,0.85)",
               }}
             >
-              {slides[current].headline}
+              {shuffled[current].headline}
             </h1>
-            {slides[current].subtext && (
+            {shuffled[current].subtext && (
               <p
                 className="text-sm sm:text-base font-bold tracking-[0.2em] uppercase text-white/75"
                 style={{ textShadow: "0 1px 8px rgba(0,0,0,0.75)" }}
               >
-                {slides[current].subtext}
+                {shuffled[current].subtext}
               </p>
             )}
           </div>
@@ -303,7 +304,7 @@ export function HeroSlider({ slides = DEFAULT_SLIDES }: HeroSliderProps) {
           role="tablist"
           aria-label="Slide navigation"
         >
-          {slides.map((_, i) => (
+          {shuffled.map((_, i) => (
             <button
               key={i}
               role="tab"
