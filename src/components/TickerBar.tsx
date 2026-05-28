@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 interface TickerData {
   event: {
@@ -31,20 +31,36 @@ export function TickerBar() {
   // null = no upcoming event → render nothing
   if (data === null) return null;
 
-  let text = "";
+  let nodes: React.ReactNode = null;
   if (data) {
-    const eventParts = [
-      `⚡ Next Up: ${data.event.title}`,
-      data.event.date,
-      data.event.time,
-      data.event.location,
-    ].filter(Boolean).join("  ·  ");
-
-    const weatherPart = data.weather?.length
-      ? `🌡 ${data.weather.map((w) => [w.field, w.time, `${w.emoji} ${w.temp}°`].filter(Boolean).join(" ")).join("  ·  ")}`
-      : null;
-
-    text = [eventParts, weatherPart].filter(Boolean).join("          ");
+    const sep = "  ·  ";
+    const parts: React.ReactNode[] = [
+      `⚡ Next Up: ${data.event.title}${sep}${data.event.date}`,
+    ];
+    if (data.event.time) parts.push(`${sep}${data.event.time}`);
+    if (data.event.location) {
+      const mapsUrl = `https://maps.google.com/maps?q=${encodeURIComponent(data.event.location)}`;
+      parts.push(sep);
+      parts.push(
+        <a
+          key="loc"
+          href={mapsUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: "inherit", textDecorationLine: "underline", textUnderlineOffset: "3px" }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {data.event.location}
+        </a>
+      );
+    }
+    if (data.weather?.length) {
+      const wx = data.weather
+        .map((w) => [w.field, w.time, `${w.emoji} ${w.temp}°`].filter(Boolean).join(" "))
+        .join(sep);
+      parts.push(`          🌡 ${wx}`);
+    }
+    nodes = parts;
   }
 
   return (
@@ -78,7 +94,7 @@ export function TickerBar() {
                 className="whitespace-nowrap text-xs font-bold tracking-wide shrink-0 px-16"
                 style={{ color: "var(--accent-fg)" }}
               >
-                {text}
+                {nodes}
               </span>
             ))}
           </div>
