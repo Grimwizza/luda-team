@@ -47,6 +47,54 @@ const PHOTOS = [
     alt: "Drew in action",
     caption: "All heart.",
   },
+  {
+    id: 8,
+    src: "/gallery/00 - Yushen Chen.jpg",
+    alt: "Yushen Chen – #00",
+    caption: "#00 — Yushen Chen",
+  },
+  {
+    id: 9,
+    src: "/gallery/01 - Nick Cavada.jpg",
+    alt: "Nick Cavada – #01",
+    caption: "#01 — Nick Cavada",
+  },
+  {
+    id: 10,
+    src: "/gallery/05 - Drew Wood.jpg",
+    alt: "Drew Wood – #05",
+    caption: "#05 — Drew Wood",
+  },
+  {
+    id: 11,
+    src: "/gallery/09 - Eli Gunderson.png",
+    alt: "Eli Gunderson – #09",
+    caption: "#09 — Eli Gunderson",
+  },
+  {
+    id: 12,
+    src: "/gallery/16 - Tyler Lowell.jpg",
+    alt: "Tyler Lowell – #16",
+    caption: "#16 — Tyler Lowell",
+  },
+  {
+    id: 13,
+    src: "/gallery/18 - Matthew Genz.jpg",
+    alt: "Matthew Genz – #18",
+    caption: "#18 — Matthew Genz",
+  },
+  {
+    id: 14,
+    src: "/gallery/23 - Owen Black.jpg",
+    alt: "Owen Black – #23",
+    caption: "#23 — Owen Black",
+  },
+  {
+    id: 15,
+    src: "/gallery/29 - Whitney Szorcsik.jpg",
+    alt: "Whitney Szorcsik – #29",
+    caption: "#29 — Whitney Szorcsik",
+  },
 ];
 
 const GOOGLE_PHOTOS_URL = "https://photos.app.goo.gl/BQm2qTJqvwRpShR99";

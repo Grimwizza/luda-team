@@ -67,6 +67,23 @@ const DEFAULT_SLIDES: Slide[] = [
     overlayVariant: "dark",
     kenBurnsDirection: "top-left",
   },
+  {
+    type: "image",
+    src: "/hero/Nadia - Aciton Shot - 2026.jpg",
+    alt: "Nadia in action – 2026",
+    headline: "Chase every disc.",
+    overlayVariant: "red",
+    kenBurnsDirection: "center",
+  },
+  {
+    type: "image",
+    src: "/hero/Group 1.jpg",
+    alt: "The Crayons team – 2026",
+    headline: "One team.",
+    subtext: "Spring Season 2026",
+    overlayVariant: "diagonal",
+    kenBurnsDirection: "bottom-right",
+  },
 ];
 
 interface HeroSliderProps {
