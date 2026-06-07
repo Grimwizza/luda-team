@@ -162,6 +162,12 @@ export default function TeamPage() {
             <div className="flex flex-wrap gap-3">
               <span
                 className="flex items-center gap-2 px-4 py-2 rounded-2xl text-sm font-black"
+                style={{ backgroundColor: "#b8860b", color: "#fff5d0" }}
+              >
+                🏆 2026 — 1st Place
+              </span>
+              <span
+                className="flex items-center gap-2 px-4 py-2 rounded-2xl text-sm font-black"
                 style={{ backgroundColor: "var(--accent)", color: "var(--accent-fg)" }}
               >
                 🏆 2013 — State Champions
@@ -173,6 +179,7 @@ export default function TeamPage() {
                 🥈 2025 — 2nd Place
               </span>
             </div>
+
           </div>
 
           {/* Classic South Conference Champions */}
