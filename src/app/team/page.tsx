@@ -153,6 +153,26 @@ export default function TeamPage() {
         </div>
         <div className="flex flex-col gap-5">
 
+          {/* 2026 Championship Team Photo */}
+          <div
+            style={{ backgroundColor: "var(--card-bg)", borderColor: "var(--card-border)" }}
+            className="border rounded-3xl overflow-hidden"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/gallery/2026 LUDA Championship Team Photo.jpg"
+              alt="LUDA Crayons — 2026 Division II State Champions"
+              className="w-full object-cover"
+              style={{ maxHeight: "480px", objectPosition: "center top" }}
+            />
+            <div className="px-6 py-4 flex items-center gap-3">
+              <span className="text-xl">🏆</span>
+              <p className="text-sm font-bold" style={{ color: "var(--fg-muted)" }}>
+                The Crayons — <span style={{ color: "var(--fg)" }}>2026 Division II State Champions</span>
+              </p>
+            </div>
+          </div>
+
           {/* Division II State Tournament */}
           <div
             style={{ backgroundColor: "var(--card-bg)", borderColor: "var(--card-border)" }}
