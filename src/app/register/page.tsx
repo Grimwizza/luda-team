@@ -33,7 +33,7 @@ const STEPS = [
         <p>Complete the final registration steps directly with LUDA:</p>
         <ul className="list-disc ml-5 flex flex-col gap-1">
           <li>Read the <a href="https://drive.google.com/file/d/1aG2Y3e9FGCoqCxS1g2iA4ofnu_j9mhJs/view?usp=sharing" target="_blank" rel="noreferrer" className="underline hover:opacity-80" style={{ color: "var(--accent)" }}>LUDA Code of Conduct and Expectations</a></li>
-          <li>Print and complete the <a href="https://drive.google.com/file/d/1uAtD2-YPFWQAbSwe_hFbvkqbi-GSJFfO/view?usp=sharing" target="_blank" rel="noreferrer" className="underline hover:opacity-80" style={{ color: "var(--accent)" }}>Student/Parent Contract</a></li>
+          <li>Print and complete the <a href="https://drive.google.com/file/d/1MVNQr-iImrrGQHD0m7iQfDfpV6hSVTf1/view" target="_blank" rel="noreferrer" className="underline hover:opacity-80" style={{ color: "var(--accent)" }}>Student/Parent Contract</a></li>
           <li>Print and complete the <a href="https://drive.google.com/file/d/1gQH94zi0zF-QqK4nRBmLhQ-iSABcQA_2/view?usp=sharing" target="_blank" rel="noreferrer" className="underline hover:opacity-80" style={{ color: "var(--accent)" }}>LUDA Medical Waiver</a></li>
           <li>Pay the LUDA fee via <a href="https://checkout.square.site/merchant/MLWCQKJHS97D7/checkout/3W4TACCVURA7Q5ERURRQTYTG" target="_blank" rel="noreferrer" className="underline hover:opacity-80" style={{ color: "var(--accent)" }}>Square Checkout</a></li>
         </ul>
