@@ -8,7 +8,7 @@ export function Footer() {
       className="border-t mt-auto"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand */}
           <div>
             <Image
@@ -86,6 +86,29 @@ export function Footer() {
                 </span>
               </a>
             </div>
+          </div>
+
+          {/* Sponsor */}
+          <div>
+            <p className="font-bold text-sm uppercase tracking-wide mb-3" style={{ color: "var(--fg)" }}>
+              Proudly Sponsored By
+            </p>
+            <a
+              href="https://shop.windchillultimate.com/community/give/support-the-minnesota-wind-chill-foundation"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block hover:opacity-75 transition-opacity"
+              aria-label="Minnesota Wind Chill Foundation"
+            >
+              <Image
+                src="/sponsors/mn_wind_chill_foundation.png"
+                alt="Minnesota Wind Chill Foundation"
+                width={180}
+                height={35}
+                style={{ width: 180, height: "auto" }}
+                className="max-w-full"
+              />
+            </a>
           </div>
         </div>
 
