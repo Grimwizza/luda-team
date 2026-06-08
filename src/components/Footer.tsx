@@ -8,7 +8,7 @@ export function Footer() {
       className="border-t mt-auto"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="flex flex-wrap gap-x-12 gap-y-8 justify-between">
+        <div className="flex flex-wrap gap-x-12 gap-y-8 justify-center">
           {/* Brand */}
           <div>
             <Image
