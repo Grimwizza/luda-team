@@ -5,11 +5,11 @@ export const metadata: Metadata = {
 };
 
 const BOARD = [
-  { name: "Dani Genz",       role: "President"        },
-  { name: "Erick Cavada",    role: "Vice President"   },
-  { name: "Angie Wood",      role: "Treasurer"        },
+  { name: "Jason Binger",    role: "President"        },
+  { name: "Chris Ed",        role: "Vice President"   },
+  { name: "Jennifer Hebig",  role: "Treasurer"        },
   { name: "Alison Skelly",   role: "Secretary"        },
-  { name: "Jennifer Hebig",  role: "Member At Large"  },
+  { name: "Brian Szorcsik",  role: "Member At Large"  },
 ];
 
 export default function BoardPage() {
